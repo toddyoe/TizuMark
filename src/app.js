@@ -1368,6 +1368,7 @@ class MarkdownEditor {
     document.getElementById('set-code-line-numbers').addEventListener('change', (e) => {
       this.settings.codeLineNumbers = e.target.checked;
       this.preview.classList.toggle('code-line-numbers', e.target.checked);
+      if (this._hljsCache) this._hljsCache.clear();
       this.saveSettings();
       this.updatePreview();
     });
@@ -1730,6 +1731,7 @@ class MarkdownEditor {
     }
     this.preview.classList.toggle('code-line-numbers', s.codeLineNumbers);
     this.preview.classList.toggle('code-wrap', s.codeWrap);
+    if (this._hljsCache) this._hljsCache.clear();
     await this.applyThemeMode();
     this.applyFontScheme();
     this.applyCustomFonts();
@@ -5528,16 +5530,25 @@ input[type="checkbox"]:checked::after { display: none !important; }
       try { this.addCopyButtons(); } catch (e) { console.warn('[preview] Copy btn error:', e); }
 
       // 代码高亮 + 行号：按代码内容缓存最终结果，避免每次重渲染重复执行 hljs 与拆行
+      const lineNumOn = this.preview.classList.contains('code-line-numbers');
       if (typeof hljs !== 'undefined') {
         try {
           this.preview.querySelectorAll('pre code').forEach((block) => {
             const cls = block.className || '';
             if (/language-(math|mermaid|katex)/.test(cls)) return;
-            const key = block.textContent;
+            // 已包裹过（上一次渲染的结果）直接跳过，避免对已包 code-line 的内容重复切分/高亮
+            if (block.querySelector('.code-scroll')) return;
+            // 缓存键纳入行号状态：开/关行号不共用可能不匹配 display 规则的缓存
+            const key = block.textContent + '|' + (lineNumOn ? 1 : 0);
             const cached = this._hljsCache.get(key);
             if (cached !== undefined) {
               block.innerHTML = cached;
               return;
+            }
+            // 清除 hljs 上次高亮标记，避免 "previously highlighted" 警告与错误处理（行号数字被错误叠入文本）
+            if (block.dataset.highlighted) {
+              delete block.dataset.highlighted;
+              block.className = (block.className || '').replace(/\bhljs\b/g, '').trim();
             }
             hljs.highlightElement(block);
             const lines = block.innerHTML.split('\n');
@@ -5560,15 +5571,17 @@ input[type="checkbox"]:checked::after { display: none !important; }
         // 代码块行号（拆分代码行，CSS 控制行号显隐和换行）
         try {
           this.preview.querySelectorAll('pre code').forEach((block) => {
-            const lines = block.innerHTML.split('\n');
+            if (block.querySelector('.code-scroll')) return;
+            const lines = block.textContent.split('\n');
             while (lines.length > 0 && lines[lines.length - 1].trim() === '') lines.pop();
+            const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             if (lines.length <= 1) {
-              block.innerHTML = `<div class="code-scroll">${lines[0] || ''}</div>`;
+              block.innerHTML = `<div class="code-scroll">${esc(lines[0] || '')}</div>`;
               return;
             }
             block.innerHTML = `<div class="code-scroll">${
               lines.map((line, i) =>
-                `<span class="code-line"><span class="code-line-num">${i + 1}</span><span class="code-line-text">${line || '&nbsp;'}</span></span>`
+                `<span class="code-line"><span class="code-line-num">${i + 1}</span><span class="code-line-text">${esc(line) || '&nbsp;'}</span></span>`
               ).join('')
             }</div>`;
           });
