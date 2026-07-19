@@ -5857,11 +5857,7 @@ input[type="checkbox"]:checked::after { display: none !important; }
   }
 
   updateWordCount() {
-    const content = this.cm.getValue();
-    const text = content.replace(/[#*`~\[\]()>_|\\-]/g, '').replace(/\s+/g, ' ').trim();
-    const words = text ? text.split(/\s+/).length : 0;
-    const chars = content.length;
-    const lines = content ? content.split('\n').length : 0;
+    const { words, chars, lines } = WordCount.countStats(this.cm.getValue());
     this.wordCountEl.textContent = `${this.t('words')}: ${words}`;
     this.charCountEl.textContent = `${this.t('chars')}: ${chars}`;
     this.lineCountEl.textContent = `${this.t('lines')}: ${lines}`;
