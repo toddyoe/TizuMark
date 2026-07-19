@@ -806,9 +806,65 @@
       <span class="loading-text">加载中…</span>
     </div>
   </div>
+  <div id="loading-progress-fill" class="loading-progress-fill"></div>
+  <span class="loading-text" id="loading-text">加载中…</span>
+  <div id="eula-dialog" class="dialog-overlay hidden" role="dialog" aria-modal="true">
+    <div class="dialog eula-dialog">
+      <button id="eula-accept" class="dialog-btn dialog-btn-primary">我知道了</button>
+    </div>
+  </div>
 
   <script src="tauri-mock.js"></script>
   <script src="lib/unified-bundle.js"></script>
+  <script src="modules/code-block.js"></script>
+  <script src="modules/preview-post.js"></script>
+  <script>
+    // Test-harness shim: auto-create any missing element so MarkdownEditor can
+    // construct headlessly without a full replica of the real app DOM.
+    (function () {
+      const realGet = document.getElementById.bind(document);
+      const cache = {};
+      function makeStub(id) {
+        const el = document.createElement('div');
+        if (id) el.id = id;
+        el.classList.add('hidden');
+        el.style = el.style || {};
+        el.addEventListener = function () {};
+        el.removeEventListener = function () {};
+        el.querySelector = function (s) { return docQuery(s, true); };
+        el.querySelectorAll = function () { return []; };
+        el.appendChild = function () {};
+        el.setAttribute = function () {};
+        el.getAttribute = function () { return null; };
+        el.closest = function () { return makeStub(); };
+        el.textContent = '';
+        return el;
+      }
+      document.getElementById = function (id) {
+        let el = realGet(id);
+        if (!el) {
+          if (cache[id]) return cache[id];
+          el = makeStub(id);
+          cache[id] = el;
+          const target = document.getElementById('app') || document.body;
+          target.appendChild(el);
+        }
+        return el;
+      };
+      const realQuery = document.querySelector.bind(document);
+      const docQuery = function (sel, allowStub) {
+        let el = realQuery(sel);
+        if (el) return el;
+        if (allowStub) {
+          if (cache[sel]) return cache[sel];
+          el = makeStub();
+          cache[sel] = el;
+        }
+        return el || null;
+      };
+      document.querySelector = function (sel) { return docQuery(sel, true); };
+    })();
+  </script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -109,3 +109,46 @@ test('无 hljs 时仍能按行包裹（纯转义）', () => {
   assert.ok(txt, '多行块应存在 .code-line-text');
   assert.ok(txt.innerHTML.includes('&lt;'), '应包含转义后的 &lt;，实际: ' + txt.innerHTML);
 });
+
+// 回归：切换行号 / 多次渲染后，代码块整体不得被多余的 [ ] 包裹。
+// 用含合法 [ ] 的源码（const a=[1,2]），区分「源码里的方括号」与「结构破损产生的包裹方括号」。
+const MD_BRACKET = B + B + B + 'javascript\nconst a=[1,2];\nconst b=JSON.parse("{}");\n' + B + B + B;
+
+function blockText(preview) {
+  const code = preview.querySelector('pre code');
+  // 取第一层 .code-scroll 内的纯文本（去掉行号数字），用于判断是否有包裹 [ ]
+  const scroll = code.querySelector(':scope > .code-scroll');
+  if (scroll) return scroll.textContent;
+  return code.textContent;
+}
+
+function assertNoWrapArtifact(text, label) {
+  const trimmed = text.trim();
+  assert.strictEqual(trimmed.startsWith('['), false, label + '：开头出现多余 [ -> ' + trimmed.slice(0, 20));
+  assert.strictEqual(trimmed.endsWith(']'), false, label + '：结尾出现多余 ] -> ' + trimmed.slice(-20));
+  // 整块被 [ ... ] 包裹（开头 [ 且结尾 ]）视为破损
+  assert.strictEqual(trimmed.startsWith('[') && trimmed.endsWith(']'), false, label + '：整块被 [ ] 包裹 -> ' + trimmed.slice(0, 20) + '...' + trimmed.slice(-20));
+}
+
+test('代码块不被多余 [ ] 包裹（含合法方括号的源码）', () => {
+  const { preview } = createPreviewDom();
+  const win = preview.ownerDocument.defaultView;
+  const hljs = loadHljs(win);
+  const cache = new Map();
+  const states = [false, true, false, true, false, true];
+  for (const on of states) {
+    preview.classList.toggle('code-line-numbers', on);
+    renderInto(preview, MD_BRACKET);
+    processCodeBlocks(preview, { hljs, cache, lineNumbers: on });
+    const t = blockText(preview);
+    assertNoWrapArtifact(t, 'state=' + on);
+  }
+});
+
+test('无 hljs 分支同样不被多余 [ ] 包裹', () => {
+  const { preview } = createPreviewDom();
+  const cache = new Map();
+  renderInto(preview, MD_BRACKET);
+  processCodeBlocks(preview, { hljs: undefined, cache, lineNumbers: true });
+  assertNoWrapArtifact(blockText(preview), 'no-hljs');
+});
