@@ -2886,16 +2886,7 @@ class MarkdownEditor {
     const findCount = document.getElementById('find-count');
     let lastQuery = '';
 
-    const isSafeRegex = (q) => {
-      if (q.length > 500) return false;
-      // 拦截常见灾难性回溯（ReDoS）模式：嵌套量词、相邻量词、重复组等
-      if (/[+*?}]\)[\s]*[+*{]|[+*}]\s*[+*{]/.test(q)) return false;
-      if (/(\([^()]*[+*?][^()]*\))\1/.test(q)) return false; // 重复捕获组 (a)(a)
-      if (/[+*?]\s*\((?!\?)/.test(q)) return false;           // 量词后紧跟捕获组 a*(...)
-      if (/\(\?[=!:].*\)\s*[+*?]/.test(q)) return false;       // 先行/后行断言后接量词
-      if (/(.\s*.\s*.\s*.\s*.\s*.\s*.\s*.\s*.\s*.\s*)\*/.test(q)) return false; // 超长字符序列后量词
-      return true;
-    };
+    const isSafeRegex = FindReplace.isSafeRegex;
 
     // 带步数上限的安全匹配计数：避免灾难性回溯卡死主线程
     const safeMatchCount = (text, re, limit = 200000) => {
