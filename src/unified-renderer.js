@@ -772,7 +772,7 @@ function renderFootnotes(html, definitions) {
   const fnIds = []; // [{ id, elementId }]
 
   for (const def of definitions) {
-    let baseId = def.id.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+    let baseId = def.id.toLowerCase().replace(/[\s"'<>&#]/g, '-').replace(/--+/g, '-').replace(/^-|-$/g, '');
     if (!baseId) baseId = 'fn';
     const count = usedIds.get(baseId) || 0;
     const elementId = count === 0 ? baseId : baseId + '-' + count;
