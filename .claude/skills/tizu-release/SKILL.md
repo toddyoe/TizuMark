@@ -95,7 +95,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const TOKEN = 'REDACTED_GITEE_TOKEN';
+const TOKEN = process.env.GITEE_TOKEN;
 const VERSION = '{version}'; // ← 替换为实际版本号
 
 const releaseBody = {
@@ -183,7 +183,7 @@ node scripts/release.js
 
 ```javascript
 // 在同一脚本中追加，或单独执行
-const GITHUB_TOKEN = 'REDACTED_GITHUB_TOKEN';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 function githubRequest(method, path, body, contentType = 'application/json') {
   return new Promise((resolve, reject) => {
@@ -247,7 +247,7 @@ GitHub Release body 用英文，内容与 Gitee 对应。
 ## 步骤 8：验证
 
 ```powershell
-node -e "const https=require('https');https.get('https://gitee.com/api/v5/repos/tizu/tizu-mark/releases/{Release_ID}',{headers:{'Authorization':'Bearer REDACTED_GITEE_TOKEN'}},r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{const j=JSON.parse(d);console.log('name:',j.name);console.log('body contains 下载:',j.body.includes('下载'))})})"
+node -e "const https=require('https');https.get('https://gitee.com/api/v5/repos/tizu/tizu-mark/releases/{Release_ID}',{headers:{'Authorization':'Bearer ' + process.env.GITEE_TOKEN}},r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{const j=JSON.parse(d);console.log('name:',j.name);console.log('body contains 下载:',j.body.includes('下载'))})})"
 ```
 
 确认 Gitee Release body 中文显示正常。

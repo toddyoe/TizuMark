@@ -159,7 +159,7 @@ Copy-Item -Path "update-windows-x86_64.json" -Destination "release/" -Force
 **不要删除旧 Release**，直接新建：
 
 ```bash
-$token = "REDACTED_GITEE_TOKEN"; Invoke-RestMethod -Uri "https://gitee.com/api/v5/repos/tizu/tizu-mark/releases" -Method Get -Headers @{"Authorization"="Bearer $token"} | Select-Object id, tag_name
+$token = $env:GITEE_TOKEN; Invoke-RestMethod -Uri "https://gitee.com/api/v5/repos/tizu/tizu-mark/releases" -Method Get -Headers @{"Authorization"="Bearer $token"} | Select-Object id, tag_name
 ```
 
 #### 7. 创建 Release + 上传附件
@@ -171,7 +171,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const TOKEN = 'REDACTED_GITEE_TOKEN';
+const TOKEN = process.env.GITEE_TOKEN;
 
 const releaseBody = {
   tag_name: 'v{version}',
@@ -261,7 +261,7 @@ node scripts/release.js
 
 确认 Gitee Release body 中文显示正常：
 ```bash
-node -e "const https=require('https');https.get('https://gitee.com/api/v5/repos/tizu/tizu-mark/releases/{Release_ID}',{headers:{'Authorization':'Bearer REDACTED_GITEE_TOKEN'}},r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{const j=JSON.parse(d);console.log('name:',j.name);console.log('body contains 下载:',j.body.includes('下载'))})})"
+node -e "const https=require('https');https.get('https://gitee.com/api/v5/repos/tizu/tizu-mark/releases/{Release_ID}',{headers:{'Authorization':'Bearer ' + process.env.GITEE_TOKEN}},r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{const j=JSON.parse(d);console.log('name:',j.name);console.log('body contains 下载:',j.body.includes('下载'))})})"
 ```
 
 #### 9. 提交推送
@@ -303,7 +303,7 @@ git push
 | 删除附件 | DELETE | `/releases/{release_id}/attach_files/{file_id}` | 返回 204，**注意 release_id 不能省略** |
 | 更新 release | PATCH | `/releases/{release_id}` | body 必须包含全部字段（`tag_name`, `name`, `body`） |
 
-Token：`REDACTED_GITEE_TOKEN`
+Token：从环境变量 `GITEE_TOKEN` 读取
 
 ### GitHub API
 
@@ -314,7 +314,7 @@ Token：`REDACTED_GITEE_TOKEN`
 | 创建 release | POST | `/releases` | body 含 `tag_name`, `name`, `body`（JSON） |
 | 上传附件 | POST | `/releases/{release_id}/assets?name={filename}` | uploads.github.com, Content-Type: application/octet-stream |
 
-Token：`REDACTED_GITHUB_TOKEN`
+Token：从环境变量 `GITHUB_TOKEN` 读取
 
 GitHub Release 需上传与 Gitee Release 相同的 4 个文件（NSIS + MSI + 绿色版 + update JSON），release body 用英文。
 
