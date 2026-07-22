@@ -24257,13 +24257,13 @@ var UnifiedRenderer = (() => {
               while (j < attrs.length && !/\s/.test(attrs[j])) j++;
             }
             let raw3 = attrs.substring(nameStart, j);
-            if (attrName.startsWith("on") || /javascript:/i.test(raw3)) {
+            if (attrName.startsWith("on") || /javascript:/i.test(raw3) || attrName === "style") {
               continue;
             }
             cleaned += raw3;
           } else {
             let raw3 = attrs.substring(nameStart, j);
-            if (attrName.startsWith("on") || /javascript:/i.test(raw3)) {
+            if (attrName.startsWith("on") || /javascript:/i.test(raw3) || attrName === "style") {
               continue;
             }
             cleaned += raw3;
