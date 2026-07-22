@@ -127,3 +127,66 @@ test('代码块内 == 不被高亮', () => {
   assert.ok(html.includes('a == b'), '代码块内 == 应原样保留');
   assert.ok(!html.includes('<mark>'), '代码块内 == 不应高亮');
 });
+
+test('blockquote 内 lazy continuation 表格渲染为 HTML <table>', () => {
+  const md = [
+    '> 引用内容',
+    '| 列1 | 列2 |',
+    '| --- | --- |',
+    '| 数据1 | 数据2 |',
+  ].join('\n');
+  const html = renderMarkdown(md, { softBreaks: false });
+  assert.ok(html.includes('blockquote'), '应包含 blockquote');
+  assert.ok(html.includes('<table>'), '应包含 table');
+  const bqEnd = html.indexOf('</blockquote>');
+  const tableStart = html.indexOf('<table>');
+  assert.ok(tableStart < bqEnd, 'table 应在 blockquote 内');
+  assert.ok(html.includes('数据1'), '表格数据应渲染');
+});
+
+test('无序列表内 lazy continuation 表格渲染为 HTML <table>', () => {
+  const md = '- 列表项\n| A | B |\n| --- | --- |\n| 1 | 2 |';
+  const html = renderMarkdown(md, { softBreaks: false });
+  assert.ok(html.includes('<ul '), '应包含 ul');
+  assert.ok(html.includes('<table'), '应包含 table');
+  assert.ok(html.includes('</li>'), '应包含 li 闭合');
+});
+
+test('有序列表内 lazy continuation 表格渲染为 HTML <table>', () => {
+  const md = '1. 列表项\n| A | B |\n| --- | --- |\n| 1 | 2 |';
+  const html = renderMarkdown(md, { softBreaks: false });
+  assert.ok(html.includes('<ol '), '应包含 ol');
+  assert.ok(html.includes('<table'), '应包含 table');
+});
+
+test('任务列表内 lazy continuation 表格渲染为 HTML <table>', () => {
+  const md = '- [x] 已完成\n| A | B |\n| --- | --- |\n| 1 | 2 |';
+  const html = renderMarkdown(md, { softBreaks: false });
+  assert.ok(html.includes('<input'), '应包含 checkbox');
+  assert.ok(html.includes('<table>'), '应包含 table');
+});
+
+test('空行隔开时表格不视为 lazy continuation', () => {
+  const md = '> 引用内容\n\n| A | B |\n| --- | --- |\n| 1 | 2 |';
+  const html = renderMarkdown(md, { softBreaks: false });
+  assert.ok(html.includes('blockquote'), '应包含 blockquote');
+  assert.ok(html.includes('<table'), '应包含 table');
+  const bqEnd = html.indexOf('</blockquote>');
+  const tableStart = html.indexOf('<table');
+  assert.ok(bqEnd < tableStart, '空行隔开时 table 应在 blockquote 外');
+});
+
+test('容器内表格单元格内联 Markdown 被渲染', () => {
+  const md = [
+    '> 引用',
+    '| **粗体** | `代码` | *斜体* |',
+    '| -------- | ------ | ------ |',
+    '| ~~删~~ | [链接](/) | 普通 |',
+  ].join('\n');
+  const html = renderMarkdown(md, { softBreaks: false });
+  assert.ok(html.includes('<strong>粗体</strong>'), '** 应渲染为 strong');
+  assert.ok(html.includes('<code>代码</code>'), '` 应渲染为 code');
+  assert.ok(html.includes('<em>斜体</em>'), '* 应渲染为 em');
+  assert.ok(html.includes('<del>删</del>'), '~~ 应渲染为 del');
+  assert.ok(html.includes('<a href="/">链接</a>'), '[]() 应渲染为链接');
+});

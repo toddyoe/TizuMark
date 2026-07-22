@@ -326,6 +326,142 @@ function convertDefLists(content) {
   return result.join('\n');
 }
 
+// Convert container-embedded GFM tables (lazy continuation)
+// e.g., > text\n| a | b |\n| - | - |\n| 1 | 2 |
+// Converts to HTML <table> before unified pipeline so remark doesn't miss them
+function convertContainerTables(content) {
+  const lines = content.split('\n');
+  const result = [];
+  let i = 0;
+  let inCodeBlock = false;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (/^ {0,3}(```|~~~)/.test(line)) {
+      inCodeBlock = !inCodeBlock;
+      result.push(line);
+      i++;
+      continue;
+    }
+    if (inCodeBlock) {
+      result.push(line);
+      i++;
+      continue;
+    }
+
+    if (isTableRow(line) && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+      const prevIdx = prevNonBlankLine(lines, i - 1);
+      if (prevIdx !== -1 && prevIdx === i - 1 && isContainerLine(lines[prevIdx])) {
+        const tableLines = [line, lines[i + 1]];
+        let j = i + 2;
+        while (j < lines.length && isTableRow(lines[j])) {
+          tableLines.push(lines[j]);
+          j++;
+        }
+        const tableHtml = gfmTableToHtml(tableLines);
+        const prefix = lines[prevIdx].trimStart().startsWith('>') ? '> ' : '  ';
+        const prefixedHtml = tableHtml.split('\n').map(l => l === '' ? l : prefix + l).join('\n');
+        result.push(prefixedHtml);
+        i = j;
+        continue;
+      }
+    }
+
+    result.push(line);
+    i++;
+  }
+
+  return result.join('\n');
+}
+
+function isContainerLine(line) {
+  const t = line.trimStart();
+  return /^>/.test(t) || /^[-*+]\s/.test(t) || /^\d+[.)]\s/.test(t);
+}
+
+function isTableRow(line) {
+  return /^\|.+\|$/.test(line.trim());
+}
+
+function isTableSep(line) {
+  const t = line.trim();
+  return /^\|[-:| ]+\|$/.test(t) && /---/.test(t);
+}
+
+function prevNonBlankLine(lines, startIdx) {
+  for (let i = startIdx; i >= 0; i--) {
+    if (lines[i].trim() !== '') return i;
+  }
+  return -1;
+}
+
+function gfmTableToHtml(tableLines) {
+  const allLines = tableLines.map(l => l.trim());
+  const headerLine = allLines[0];
+  const sepLine = allLines[1];
+  const dataLines = allLines.slice(2).filter(l => l !== '');
+
+  const headerCells = headerLine.split('|').filter((c, i, a) => i > 0 && i < a.length - 1);
+  const colCount = headerCells.length;
+
+  const sepCells = sepLine.split('|').filter((c, i, a) => i > 0 && i < a.length - 1);
+  const aligns = sepCells.map(cell => {
+    const t = cell.trim();
+    if (t.startsWith(':') && t.endsWith(':')) return 'center';
+    if (t.endsWith(':')) return 'right';
+    if (t.startsWith(':')) return 'left';
+    return null;
+  });
+
+  let html = '<table>\n<thead>\n<tr>\n';
+  for (let ci = 0; ci < colCount; ci++) {
+    const align = aligns[ci] || null;
+    html += '<th' + (align ? ' style="text-align:' + align + '"' : '') + '>' + renderCellContent(headerCells[ci].trim()) + '</th>\n';
+  }
+  html += '</tr>\n</thead>\n';
+
+  if (dataLines.length > 0) {
+    html += '<tbody>\n';
+    for (const row of dataLines) {
+      const cells = row.split('|').filter((c, i, a) => i > 0 && i < a.length - 1);
+      html += '<tr>\n';
+      for (let ci = 0; ci < colCount; ci++) {
+        const cell = ci < cells.length ? cells[ci].trim() : '';
+        html += '<td>' + renderCellContent(cell) + '</td>\n';
+      }
+      html += '</tr>\n';
+    }
+    html += '</tbody>\n';
+  }
+
+  html += '</table>';
+  return html;
+}
+
+function renderCellContent(text) {
+  let result = escapeHTML(text);
+
+  const codeSpans = [];
+  result = result.replace(/`(.+?)`/g, (m, code) => {
+    const idx = codeSpans.length;
+    codeSpans.push(code);
+    return '%%CODE' + idx + '%%';
+  });
+
+  result = result
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/~~(.+?)~~/g, '<del>$1</del>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+
+  result = result.replace(/%%CODE(\d+)%%/g, (m, idx) => {
+    return '<code>' + codeSpans[parseInt(idx)] + '</code>';
+  });
+
+  return result;
+}
+
 // Extract abbreviations and hide from output
 function extractAbbreviations(content) {
   const abbrs = [];
@@ -581,6 +717,9 @@ function renderMarkdown(content, options) {
 
   // 4. Convert definition lists
   let processed = convertDefLists(alertResult.content);
+
+  // 4.5. Convert container-embedded tables (lazy continuation)
+  processed = convertContainerTables(processed);
 
   // 5. Unified pipeline
   let html;
