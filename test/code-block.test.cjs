@@ -152,3 +152,47 @@ test('无 hljs 分支同样不被多余 [ ] 包裹', () => {
   processCodeBlocks(preview, { hljs: undefined, cache, lineNumbers: true });
   assertNoWrapArtifact(blockText(preview), 'no-hljs');
 });
+
+// 回归：bundle 输出的 <code> 不带 hljs class（bundle 不调 hljs），cache hit 路径只设 innerHTML 不调
+// hljs.highlightElement。若 <code> 漏掉 hljs class，hljs github.min.css / styles.css 的
+// `pre code.hljs { display:block }` 不应用 → <code> 默认 display:inline → 内嵌 <div class="code-scroll">
+// 不合法 → 浏览器把 inline <code> 打断成两段，预览出现两个浅色矩形装饰。
+test('重渲染 cache hit 后 <code> 必须带 hljs class（避免 inline 打断成两段）', () => {
+  const { preview } = createPreviewDom();
+  const win = preview.ownerDocument.defaultView;
+  const hljs = loadHljs(win);
+  const cache = new Map();
+
+  // 1) 首次渲染：cache miss → hljs.highlightElement 自动加 hljs class
+  renderInto(preview, MD);
+  processCodeBlocks(preview, { hljs, cache, lineNumbers: false });
+  let code = preview.querySelector('pre code');
+  assert.ok(code.classList.contains('hljs'), '首次渲染后 <code> 应带 hljs class');
+
+  // 2) 重渲染（模拟编辑触发，bundle 重新输出干净的 <code class="language-x">）：
+  //    preview.innerHTML 替换后 <code> 失去 hljs class；cache hit 时应补回。
+  renderInto(preview, MD);
+  code = preview.querySelector('pre code');
+  assert.strictEqual(code.classList.contains('hljs'), false, 'bundle 输出的 <code> 不应带 hljs class');
+
+  processCodeBlocks(preview, { hljs, cache, lineNumbers: false });
+  code = preview.querySelector('pre code');
+  assert.ok(code.classList.contains('hljs'), 'cache hit 后 <code> 必须补回 hljs class');
+});
+
+// 回归：纯文本代码块（无语言标识）cache hit 后也应正常显示，不应有结构破损
+test('无语言标识的代码块重渲染后结构合法', () => {
+  const { preview } = createPreviewDom();
+  const win = preview.ownerDocument.defaultView;
+  const hljs = loadHljs(win);
+  const cache = new Map();
+  const mdPlain = B + B + B + '\nplain text line 1\nplain text line 2\n' + B + B + B;
+
+  renderInto(preview, mdPlain);
+  processCodeBlocks(preview, { hljs, cache, lineNumbers: false });
+  // 第一次后应能命中缓存
+  renderInto(preview, mdPlain);
+  processCodeBlocks(preview, { hljs, cache, lineNumbers: false });
+  const s = structureOf(preview);
+  assert.deepStrictEqual(s, { ok: true }, '无语言标识块重渲染后结构破损: ' + (s.reason || 'ok'));
+});

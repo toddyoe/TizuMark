@@ -38,6 +38,41 @@ test('数学未加载时安全跳过不抛错', () => {
   assert.doesNotThrow(() => PP.processMath(preview));
 });
 
+test('protectUnpairedDollar：块级公式内含 | > ｜ 不应被误判为不成对', () => {
+  // 条件概率：含 |
+  const bayes = '$$ P(A|B) = \\frac{P(B|A) \\cdot P(A)}{P(B)} $$';
+  assert.strictEqual(PP.protectUnpairedDollar(bayes), bayes, '含 | 的块级公式应保持原样');
+  assert.ok(!PP.protectUnpairedDollar(bayes).includes('katex-ignore'), '不应包裹忽略 span');
+
+  // 绝对值/范数：含 ||
+  const norm = '$$ \\|x\\| = \\sqrt{x^2} $$';
+  assert.strictEqual(PP.protectUnpairedDollar(norm), norm, '含 || 的块级公式应保持原样');
+
+  // 比较符号：含 >
+  const gt = '$$ f(x) \\text{ if } x > 0 $$';
+  assert.strictEqual(PP.protectUnpairedDollar(gt), gt, '含 > 的块级公式应保持原样');
+
+  // 全角竖线
+  const fw = '$$ a ｜ b $$';
+  assert.strictEqual(PP.protectUnpairedDollar(fw), fw, '含 ｜ 的块级公式应保持原样');
+
+  // 块级跨行
+  const multi = '$$\nfoo\nbar\n$$';
+  assert.strictEqual(PP.protectUnpairedDollar(multi), multi, '块级跨行公式应保持原样');
+});
+
+test('protectUnpairedDollar：行内 $...$ 内含 | 仍应被忽略（防 markdown 表格列误吃）', () => {
+  const inline = 'see $P(A|B)$ here';
+  const out = PP.protectUnpairedDollar(inline);
+  assert.ok(out.includes('katex-ignore'), '行内含 | 应被忽略 span 包住');
+});
+
+test('protectUnpairedDollar：真不成对的孤 $ 应被忽略', () => {
+  const stray = 'price is $5 and $6 today';
+  const out = PP.protectUnpairedDollar(stray);
+  assert.ok(out.includes('katex-ignore'), '孤 $ 应被忽略 span 包住');
+});
+
 test('缩写 abbr 被替换且跳过 code/pre', () => {
   const { preview } = createPreviewDom();
   preview.innerHTML = '<div id="abbr-data" data-abbrs=\'[[ "Tizu", "TizuMark 编辑器" ]]\'></div><p>用 Tizu 写文档，<code>Tizu</code> 不替换</p>';

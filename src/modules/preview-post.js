@@ -82,10 +82,12 @@ function protectUnpairedDollar(text) {
       // 仅当 $$ 处于"块级"边界（前后为行首/行尾/空白）时才视为显示公式 $$...$$
       const openOk = isLineBoundary(text[i - 1]);
       const close = text.indexOf('$$', i + 2);
+      // 块级放宽：只要 $$ 自身成对 + 闭合 $$ 后跟行边界就信任，让 KaTeX 自己用 throwOnError:false 容错。
+      // 块级允许跨行（多行 LaTeX 公式），也允许内含 | > ｜（条件概率/绝对值/范数/比较符号等是合法 LaTeX）。
+      // 行内 $...$ 仍保留 | > ｜ 限制（第 103 行），因为行内 $ 容易被 markdown 表格列误吃。
       const closeOk = close !== -1 &&
         (close + 2 === n || isLineBoundary(text[close + 2])) &&
-        (text[close - 1] !== '$') &&
-        !/[\n\r|>\uFF5C]/.test(text.substring(i + 2, close));
+        (text[close - 1] !== '$');
       if (openOk && closeOk) {
         out += text.substring(i, close + 2);
         i = close + 2;

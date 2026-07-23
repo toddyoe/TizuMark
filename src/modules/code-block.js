@@ -28,6 +28,12 @@ function processCodeBlocks(preview, opts) {
         const cached = cache.get(key);
         if (cached !== undefined) {
           block.innerHTML = cached;
+          // 关键修复：bundle 输出的 <code> 没有 hljs class（bundle 不调 hljs），
+          // 而 hljs github.min.css / styles.css 的 pre code.hljs { display:block } 依赖此 class。
+          // 缓存命中路径只设 innerHTML 不调 hljs.highlightElement，导致重渲染后 <code> 缺 hljs class
+          // → 默认 display:inline → 内嵌 <div class="code-scroll"> 不合法 → 浏览器把 inline <code>
+          // 打断成两段，预览出现两个浅色矩形装饰。
+          if (!block.classList.contains('hljs')) block.classList.add('hljs');
           return;
         }
         // 清除 hljs 上次高亮标记，避免 "previously highlighted" 警告与错误处理（行号数字被错误叠入文本）

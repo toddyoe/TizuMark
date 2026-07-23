@@ -5578,51 +5578,67 @@ input[type="checkbox"]:checked::after { display: none !important; }
 
   async processImages() {
     const gen = this._renderGeneration;
-    const filePath = this.activeTab.filePath;
-    if (!filePath || gen !== this._renderGeneration) return;
-    const dir = filePath.replace(/[/\\][^/\\]*$/, '');
+    if (gen !== this._renderGeneration) return;
+    const filePath = this.activeTab ? this.activeTab.filePath : null;
+    const dir = filePath ? filePath.replace(/[/\\][^/\\]*$/, '') : '';
+    const mimeOf = (s) => {
+      const ext = s.split('.').pop().toLowerCase();
+      if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+      if (ext === 'gif') return 'image/gif';
+      if (ext === 'svg') return 'image/svg+xml';
+      if (ext === 'webp') return 'image/webp';
+      return 'image/png';
+    };
+    const fail = (img) => {
+      img.style.border = '1px solid #d00';
+      img.style.opacity = '0.4';
+      img.alt = (img.alt || '') + ' [加载失败]';
+    };
     const images = this.preview.querySelectorAll('img');
     const promises = Array.from(images).map(async (img) => {
       let src = img.getAttribute('src');
-      if (!src || src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://') || src.startsWith('file://') || src.startsWith('blob:')) return;
+      if (!src) return;
+      // 已可显示的内联 / 远程资源直接跳过
+      if (src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://') || src.startsWith('blob:')) return;
       const gen = this._renderGeneration;
-      // Absolute path (Unix /... or Windows D:/...) — load directly
-      if (src.startsWith('/') || /^[a-zA-Z]:[/\\]/.test(src)) {
+      // file:// 协议：去掉前缀，当作绝对路径处理（demo.md 声明支持 file:// 写法）
+      let rawSrc = src.startsWith('file://') ? src.replace(/^file:\/\//, '') : src;
+      // 绝对路径（Unix /... 或 Windows D:/...）：直接走 Rust 读磁盘
+      if (rawSrc.startsWith('/') || /^[a-zA-Z]:[/\\]/.test(rawSrc)) {
         try {
-          const base64 = await invoke('fetch_image_as_base64', { url: src });
+          const base64 = await invoke('fetch_image_as_base64', { url: rawSrc });
           if (gen !== this._renderGeneration) return;
-          const ext = src.split('.').pop().toLowerCase();
-          let mime = 'image/png';
-          if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
-          else if (ext === 'gif') mime = 'image/gif';
-          else if (ext === 'svg') mime = 'image/svg+xml';
-          else if (ext === 'webp') mime = 'image/webp';
-          img.src = this.getCachedImageURL(`data:${mime};base64,${base64}`);
+          img.src = this.getCachedImageURL(`data:${mimeOf(rawSrc)};base64,${base64}`);
         } catch (e) {
-          console.warn('[preview] Failed to load image:', src, e);
-          img.style.border = '1px solid #d00';
-          img.style.opacity = '0.4';
-          img.alt = (img.alt || '') + ' [加载失败]';
+          console.warn('[preview] Failed to load image:', rawSrc, e);
+          fail(img);
         }
         return;
       }
-      // Relative path — prepend markdown file's directory
-      const absPath = dir + '/' + src;
+      // 相对路径
+      if (filePath) {
+        // 普通文件：相对当前 .md 所在目录补全
+        const absPath = dir + '/' + rawSrc;
+        try {
+          const base64 = await invoke('fetch_image_as_base64', { url: absPath });
+          if (gen !== this._renderGeneration) return;
+          img.src = this.getCachedImageURL(`data:${mimeOf(rawSrc)};base64,${base64}`);
+        } catch (e) {
+          console.warn('[preview] Failed to load image:', absPath, e);
+          fail(img);
+        }
+        return;
+      }
+      // 打包文档（使用说明 / demo）：相对 webview 根 fetch（dev: src/；screenshots 已复制到 src/ 以命中）
       try {
-        const base64 = await invoke('fetch_image_as_base64', { url: absPath });
+        const resp = await fetch(rawSrc);
+        if (!resp.ok) { fail(img); return; }
+        const blob = await resp.blob();
         if (gen !== this._renderGeneration) return;
-        const ext = src.split('.').pop().toLowerCase();
-        let mime = 'image/png';
-        if (ext === 'jpg' || ext === 'jpeg') mime = 'image/jpeg';
-        else if (ext === 'gif') mime = 'image/gif';
-        else if (ext === 'svg') mime = 'image/svg+xml';
-        else if (ext === 'webp') mime = 'image/webp';
-        img.src = this.getCachedImageURL(`data:${mime};base64,${base64}`);
+        img.src = URL.createObjectURL(blob);
       } catch (e) {
-        console.warn('[preview] Failed to load image:', absPath, e);
-        img.style.border = '1px solid #d00';
-        img.style.opacity = '0.4';
-        img.alt = (img.alt || '') + ' [加载失败]';
+        console.warn('[preview] Failed to load image:', rawSrc, e);
+        fail(img);
       }
     });
     await Promise.allSettled(promises);

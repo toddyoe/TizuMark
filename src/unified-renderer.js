@@ -3,7 +3,14 @@ const remarkParse = require('remark-parse').default || require('remark-parse');
 const remarkGfm = require('remark-gfm').default || require('remark-gfm');
 const remarkRehype = require('remark-rehype').default || require('remark-rehype');
 const rehypeRaw = require('rehype-raw').default || require('rehype-raw');
-const rehypeSanitize = require('rehype-sanitize').default || require('rehype-sanitize');
+// rehype-sanitize 是声明依赖，但某些安装环境下可能未实际装入 node_modules。
+// 缺失时降级为仅使用字符串级 sanitizeHTML（不删 width/src），保证渲染不崩且尺寸属性保留。
+let rehypeSanitize = null;
+try {
+  rehypeSanitize = require('rehype-sanitize').default || require('rehype-sanitize');
+} catch (_) {
+  rehypeSanitize = null;
+}
 const rehypeStringify = require('rehype-stringify').default || require('rehype-stringify');
 const { visit } = require('unist-util-visit');
 
@@ -907,9 +914,22 @@ function renderMarkdown(content, options) {
     }
     processor
       .use(remarkRehype, { allowDangerousHtml: true })
-      .use(rehypeRaw)
-      .use(rehypeSanitize)
-      .use(rehypeStringify, { allowDangerousHtml: true });
+      .use(rehypeRaw);
+    // 若 rehype-sanitize 可用，用扩展 schema：保留 img 的 width/height/srcset（让「指定显示尺寸」生效），
+    // 并允许 file: scheme（demo.md 声明支持 file:// 写法）。缺失时跳过，由下方 sanitizeHTML 兜底净化。
+    if (rehypeSanitize && rehypeSanitize.defaultSchema) {
+      const base = rehypeSanitize.defaultSchema;
+      const schema = {
+        ...base,
+        attributes: {
+          ...base.attributes,
+          img: [...(base.attributes.img || ['src', 'alt', 'title']), 'width', 'height', 'srcset', 'loading'],
+        },
+        allowedSchemes: [...(base.allowedSchemes || ['http', 'https', 'mailto', 'tel']), 'file'],
+      };
+      processor.use(rehypeSanitize, schema);
+    }
+    processor.use(rehypeStringify, { allowDangerousHtml: true });
     html = processor.processSync(processed).toString();
   } catch (e) {
     // Fallback: return raw content wrapped in <pre>
