@@ -358,21 +358,34 @@ function convertContainerTables(content) {
       continue;
     }
 
-    if (isTableRow(line) && i + 1 < lines.length && isTableSep(lines[i + 1])) {
-      const prevIdx = prevNonBlankLine(lines, i - 1);
-      if (prevIdx !== -1 && prevIdx === i - 1 && isContainerLine(lines[prevIdx])) {
-        const tableLines = [line, lines[i + 1]];
-        let j = i + 2;
-        while (j < lines.length && isTableRow(lines[j])) {
-          tableLines.push(lines[j]);
-          j++;
+    const sp = stripContainerPrefix(line);
+    if (i + 1 < lines.length) {
+      const spNext = stripContainerPrefix(lines[i + 1]);
+      if (isTableRow(sp.body) && isTableSep(spNext.body)) {
+        const prevIdx = prevNonBlankLine(lines, i - 1);
+        // 紧邻的上一行是容器行（lazy continuation，保留原紧邻约束避免误伤顶层表格）
+        const prevIsContainerAdj = prevIdx !== -1 && prevIdx === i - 1 && isContainerLine(lines[prevIdx]);
+        // 容器内表格：紧邻的上一行是容器行，或本行本身带容器前缀（> / 缩进 / 列表符）
+        if (prevIsContainerAdj || sp.prefix.trim() !== '') {
+          const tableLines = [sp.body, spNext.body];
+          let j = i + 2;
+          while (j < lines.length) {
+            const s = stripContainerPrefix(lines[j]);
+            if (isTableRow(s.body)) {
+              tableLines.push(s.body);
+              j++;
+            } else {
+              break;
+            }
+          }
+          const tableHtml = gfmTableToHtml(tableLines);
+          // 重新加回容器前缀，确保 <table> 仍位于容器内（否则会"逃出" blockquote/列表）
+          const prefix = sp.prefix.trim() !== '' ? sp.prefix : (prevIdx !== -1 && lines[prevIdx].trimStart().startsWith('>') ? '> ' : '  ');
+          const prefixedHtml = tableHtml.split('\n').map(l => l === '' ? l : prefix + l).join('\n');
+          result.push(prefixedHtml);
+          i = j;
+          continue;
         }
-        const tableHtml = gfmTableToHtml(tableLines);
-        const prefix = lines[prevIdx].trimStart().startsWith('>') ? '> ' : '  ';
-        const prefixedHtml = tableHtml.split('\n').map(l => l === '' ? l : prefix + l).join('\n');
-        result.push(prefixedHtml);
-        i = j;
-        continue;
       }
     }
 
@@ -395,6 +408,10 @@ function isTableRow(line) {
 function isTableSep(line) {
   const t = line.trim();
   return /^\|[-:| ]+\|$/.test(t) && /---/.test(t);
+}
+function stripContainerPrefix(line) {
+  const m = line.match(/^(\s*(?:>\s*)*)([\s\S]*)$/);
+  return { prefix: m[1], body: m[2] };
 }
 
 function prevNonBlankLine(lines, startIdx) {
@@ -723,6 +740,29 @@ function remarkSoftBreaks() {
   };
 }
 
+// 软换行关闭时：仅硬换行（两空格 / 反斜杠）转为 <br>，
+// 单换行（softbreak）保持默认（标准 markdown 行为：不生成 <br>）。
+function remarkHardBreaksOnly() {
+  return (tree) => {
+    const toBr = () => ({ type: 'html', value: '<br>' });
+    const walk = (node) => {
+      if (!node.children) return;
+      const out = [];
+      for (const child of node.children) {
+        if (child.type === 'break') {
+          out.push(toBr());
+          continue;
+        }
+        // softbreak（单换行）原样保留，由默认处理器渲染（非 <br>）
+        walk(child);
+        out.push(child);
+      }
+      node.children = out;
+    };
+    walk(tree);
+  };
+}
+
 // ---- main pipeline ----
 
 // --- Footnote extraction (pre-processing) ---
@@ -907,10 +947,14 @@ function renderMarkdown(content, options) {
     const processor = unified()
       .use(remarkParse)
       .use(remarkGfm, { singleTilde: false })
-      .use(remarkSourceLine)
-      .use(remarkBreaks);
+      .use(remarkSourceLine);
     if (softBreaks) {
+      // 软换行开启：所有换行（单 \n 与硬换行）统一渲染为 <br>
+      processor.use(remarkBreaks);
       processor.use(remarkSoftBreaks);
+    } else {
+      // 软换行关闭：仅硬换行（两空格 / 反斜杠）渲染为 <br>，单 \n 保持默认软换行（不生成 br）
+      processor.use(remarkHardBreaksOnly);
     }
     processor
       .use(remarkRehype, { allowDangerousHtml: true })

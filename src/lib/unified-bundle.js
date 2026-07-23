@@ -2471,7 +2471,7 @@ var UnifiedRenderer = (() => {
     let index2 = -1;
     let open;
     let group;
-    let text9;
+    let text10;
     let openingSequence;
     let closingSequence;
     let use;
@@ -2509,7 +2509,7 @@ var UnifiedRenderer = (() => {
               },
               end
             };
-            text9 = {
+            text10 = {
               type: use > 1 ? "strongText" : "emphasisText",
               start: {
                 ...events[open][1].end
@@ -2537,9 +2537,9 @@ var UnifiedRenderer = (() => {
             if (events[open][1].end.offset - events[open][1].start.offset) {
               nextEvents = push(nextEvents, [["enter", events[open][1], context], ["exit", events[open][1], context]]);
             }
-            nextEvents = push(nextEvents, [["enter", group, context], ["enter", openingSequence, context], ["exit", openingSequence, context], ["enter", text9, context]]);
+            nextEvents = push(nextEvents, [["enter", group, context], ["enter", openingSequence, context], ["exit", openingSequence, context], ["enter", text10, context]]);
             nextEvents = push(nextEvents, resolveAll(context.parser.constructs.insideSpan.null, events.slice(open + 1, index2), context));
-            nextEvents = push(nextEvents, [["exit", text9, context], ["enter", closingSequence, context], ["exit", closingSequence, context], ["exit", group, context]]);
+            nextEvents = push(nextEvents, [["exit", text10, context], ["enter", closingSequence, context], ["exit", closingSequence, context], ["exit", group, context]]);
             if (events[index2][1].end.offset - events[index2][1].start.offset) {
               offset = 2;
               nextEvents = push(nextEvents, [["enter", events[index2][1], context], ["exit", events[index2][1], context]]);
@@ -4107,7 +4107,7 @@ var UnifiedRenderer = (() => {
     let contentEnd = events.length - 2;
     let contentStart = 3;
     let content3;
-    let text9;
+    let text10;
     if (events[contentStart][1].type === "whitespace") {
       contentStart += 2;
     }
@@ -4123,13 +4123,13 @@ var UnifiedRenderer = (() => {
         start: events[contentStart][1].start,
         end: events[contentEnd][1].end
       };
-      text9 = {
+      text10 = {
         type: "chunkText",
         start: events[contentStart][1].start,
         end: events[contentEnd][1].end,
         contentType: "text"
       };
-      splice(events, contentStart, contentEnd - contentStart + 1, [["enter", content3, context], ["enter", text9, context], ["exit", text9, context], ["exit", content3, context]]);
+      splice(events, contentStart, contentEnd - contentStart + 1, [["enter", content3, context], ["enter", text10, context], ["exit", text10, context], ["exit", content3, context]]);
     }
     return events;
   }
@@ -4715,7 +4715,7 @@ var UnifiedRenderer = (() => {
       }
       return nok(code4);
     }
-    function comment4(code4) {
+    function comment5(code4) {
       if (code4 === null) {
         return nok(code4);
       }
@@ -4724,21 +4724,21 @@ var UnifiedRenderer = (() => {
         return commentClose;
       }
       if (markdownLineEnding(code4)) {
-        returnState = comment4;
+        returnState = comment5;
         return lineEndingBefore(code4);
       }
       effects.consume(code4);
-      return comment4;
+      return comment5;
     }
     function commentClose(code4) {
       if (code4 === 45) {
         effects.consume(code4);
         return commentEnd;
       }
-      return comment4(code4);
+      return comment5(code4);
     }
     function commentEnd(code4) {
-      return code4 === 62 ? end(code4) : code4 === 45 ? commentClose(code4) : comment4(code4);
+      return code4 === 62 ? end(code4) : code4 === 45 ? commentClose(code4) : comment5(code4);
     }
     function cdataOpenInside(code4) {
       const value = "CDATA[";
@@ -5037,7 +5037,7 @@ var UnifiedRenderer = (() => {
         ...events[close][1].end
       }
     };
-    const text9 = {
+    const text10 = {
       type: "labelText",
       start: {
         ...events[open + offset + 2][1].end
@@ -5048,9 +5048,9 @@ var UnifiedRenderer = (() => {
     };
     media = [["enter", group, context], ["enter", label, context]];
     media = push(media, events.slice(open + 1, open + offset + 3));
-    media = push(media, [["enter", text9, context]]);
+    media = push(media, [["enter", text10, context]]);
     media = push(media, resolveAll(context.parser.constructs.insideSpan.null, events.slice(open + offset + 4, close - 3), context));
-    media = push(media, [["exit", text9, context], events[close - 2], events[close - 1], ["exit", label, context]]);
+    media = push(media, [["exit", text10, context], events[close - 2], events[close - 1], ["exit", label, context]]);
     media = push(media, events.slice(close + 1));
     media = push(media, [["exit", group, context]]);
     splice(events, open, events.length, media);
@@ -5487,7 +5487,7 @@ var UnifiedRenderer = (() => {
   function resolveToSetextUnderline(events, context) {
     let index2 = events.length;
     let content3;
-    let text9;
+    let text10;
     let definition3;
     while (index2--) {
       if (events[index2][0] === "enter") {
@@ -5496,7 +5496,7 @@ var UnifiedRenderer = (() => {
           break;
         }
         if (events[index2][1].type === "paragraph") {
-          text9 = index2;
+          text10 = index2;
         }
       } else {
         if (events[index2][1].type === "content") {
@@ -5516,9 +5516,9 @@ var UnifiedRenderer = (() => {
         ...events[events.length - 1][1].end
       }
     };
-    events[text9][1].type = "setextHeadingText";
+    events[text10][1].type = "setextHeadingText";
     if (definition3) {
-      events.splice(text9, 0, ["enter", heading3, context]);
+      events.splice(text10, 0, ["enter", heading3, context]);
       events.splice(definition3 + 1, 0, ["exit", events[content3][1], context]);
       events[content3][1].end = {
         ...events[definition3][1].end
@@ -5664,10 +5664,10 @@ var UnifiedRenderer = (() => {
     function initializeText(effects) {
       const self2 = this;
       const constructs2 = this.parser.constructs[field];
-      const text9 = effects.attempt(constructs2, start, notText);
+      const text10 = effects.attempt(constructs2, start, notText);
       return start;
       function start(code4) {
-        return atBreak(code4) ? text9(code4) : notText(code4);
+        return atBreak(code4) ? text10(code4) : notText(code4);
       }
       function notText(code4) {
         if (code4 === null) {
@@ -5681,7 +5681,7 @@ var UnifiedRenderer = (() => {
       function data(code4) {
         if (atBreak(code4)) {
           effects.exit("data");
-          return text9(code4);
+          return text10(code4);
         }
         effects.consume(code4);
         return data;
@@ -6763,7 +6763,7 @@ var UnifiedRenderer = (() => {
       const siblings2 = node2.children;
       let tail = siblings2[siblings2.length - 1];
       if (!tail || tail.type !== "text") {
-        tail = text9();
+        tail = text10();
         tail.position = {
           start: point2(token.start),
           // @ts-expect-error: we’ll add `end` later.
@@ -6849,8 +6849,8 @@ var UnifiedRenderer = (() => {
       const node2 = this.stack[this.stack.length - 1];
       this.data.inReference = true;
       if (node2.type === "link") {
-        const children = fragment2.children;
-        node2.children = children;
+        const children2 = fragment2.children;
+        node2.children = children2;
       } else {
         node2.alt = value;
       }
@@ -7008,7 +7008,7 @@ var UnifiedRenderer = (() => {
         children: []
       };
     }
-    function text9() {
+    function text10() {
       return {
         type: "text",
         value: ""
@@ -8772,12 +8772,12 @@ var UnifiedRenderer = (() => {
     let subexit = state.enter("label");
     const tracker = state.createTracker(info);
     let value = tracker.move("[");
-    const text9 = state.containerPhrasing(node2, {
+    const text10 = state.containerPhrasing(node2, {
       before: value,
       after: "]",
       ...tracker.current()
     });
-    value += tracker.move(text9 + "][");
+    value += tracker.move(text10 + "][");
     subexit();
     const stack = state.stack;
     state.stack = [];
@@ -8790,7 +8790,7 @@ var UnifiedRenderer = (() => {
     subexit();
     state.stack = stack;
     exit3();
-    if (type === "full" || !text9 || text9 !== reference) {
+    if (type === "full" || !text10 || text10 !== reference) {
       value += tracker.move(reference + "]");
     } else if (type === "shortcut") {
       value = value.slice(0, -1);
@@ -9319,23 +9319,23 @@ var UnifiedRenderer = (() => {
       });
     }
     function handleTableAsData(node2, state, info) {
-      const children = node2.children;
+      const children2 = node2.children;
       let index2 = -1;
       const result = [];
       const subexit = state.enter("table");
-      while (++index2 < children.length) {
-        result[index2] = handleTableRowAsData(children[index2], state, info);
+      while (++index2 < children2.length) {
+        result[index2] = handleTableRowAsData(children2[index2], state, info);
       }
       subexit();
       return result;
     }
     function handleTableRowAsData(node2, state, info) {
-      const children = node2.children;
+      const children2 = node2.children;
       let index2 = -1;
       const result = [];
       const subexit = state.enter("tableRow");
-      while (++index2 < children.length) {
-        result[index2] = handleTableCell(children[index2], node2, state, info);
+      while (++index2 < children2.length) {
+        result[index2] = handleTableCell(children2[index2], node2, state, info);
       }
       subexit();
       return result;
@@ -10171,17 +10171,17 @@ var UnifiedRenderer = (() => {
                 start: Object.assign({}, events[open][1].start),
                 end: Object.assign({}, events[index2][1].end)
               };
-              const text9 = {
+              const text10 = {
                 type: "strikethroughText",
                 start: Object.assign({}, events[open][1].end),
                 end: Object.assign({}, events[index2][1].start)
               };
-              const nextEvents = [["enter", strikethrough2, context], ["enter", events[open][1], context], ["exit", events[open][1], context], ["enter", text9, context]];
+              const nextEvents = [["enter", strikethrough2, context], ["enter", events[open][1], context], ["exit", events[open][1], context], ["enter", text10, context]];
               const insideSpan2 = context.parser.constructs.insideSpan.null;
               if (insideSpan2) {
                 splice(nextEvents, nextEvents.length, 0, resolveAll(insideSpan2, events.slice(open + 1, index2), context));
               }
-              splice(nextEvents, nextEvents.length, 0, [["exit", text9, context], ["enter", events[index2][1], context], ["exit", events[index2][1], context], ["exit", strikethrough2, context]]);
+              splice(nextEvents, nextEvents.length, 0, [["exit", text10, context], ["enter", events[index2][1], context], ["exit", events[index2][1], context], ["exit", strikethrough2, context]]);
               splice(events, open - 1, index2 - open + 3, nextEvents);
               index2 = open + nextEvents.length - 2;
               break;
@@ -10314,8 +10314,8 @@ var UnifiedRenderer = (() => {
           events.length = 0;
           let slice = vecs.pop();
           while (slice) {
-            for (const element6 of slice) {
-              events.push(element6);
+            for (const element7 of slice) {
+              events.push(element7);
             }
             slice = vecs.pop();
           }
@@ -10931,15 +10931,15 @@ var UnifiedRenderer = (() => {
   // node_modules/mdast-util-to-hast/lib/handlers/code.js
   function code3(state, node2) {
     const value = node2.value ? node2.value + "\n" : "";
-    const properties = {};
+    const properties2 = {};
     const language = node2.lang ? node2.lang.split(/\s+/) : [];
     if (language.length > 0) {
-      properties.className = ["language-" + language[0]];
+      properties2.className = ["language-" + language[0]];
     }
     let result = {
       type: "element",
       tagName: "code",
-      properties,
+      properties: properties2,
       children: [{ type: "text", value }]
     };
     if (node2.meta) {
@@ -11101,11 +11101,11 @@ var UnifiedRenderer = (() => {
     if (!definition3) {
       return revert(state, node2);
     }
-    const properties = { src: normalizeUri(definition3.url || ""), alt: node2.alt };
+    const properties2 = { src: normalizeUri(definition3.url || ""), alt: node2.alt };
     if (definition3.title !== null && definition3.title !== void 0) {
-      properties.title = definition3.title;
+      properties2.title = definition3.title;
     }
-    const result = { type: "element", tagName: "img", properties, children: [] };
+    const result = { type: "element", tagName: "img", properties: properties2, children: [] };
     state.patch(node2, result);
     return state.applyData(node2, result);
   }
@@ -11118,14 +11118,14 @@ var UnifiedRenderer = (() => {
 
   // node_modules/mdast-util-to-hast/lib/handlers/image.js
   function image2(state, node2) {
-    const properties = { src: normalizeUri(node2.url) };
+    const properties2 = { src: normalizeUri(node2.url) };
     if (node2.alt !== null && node2.alt !== void 0) {
-      properties.alt = node2.alt;
+      properties2.alt = node2.alt;
     }
     if (node2.title !== null && node2.title !== void 0) {
-      properties.title = node2.title;
+      properties2.title = node2.title;
     }
-    const result = { type: "element", tagName: "img", properties, children: [] };
+    const result = { type: "element", tagName: "img", properties: properties2, children: [] };
     state.patch(node2, result);
     return state.applyData(node2, result);
   }
@@ -11137,13 +11137,13 @@ var UnifiedRenderer = (() => {
 
   // node_modules/mdast-util-to-hast/lib/handlers/inline-code.js
   function inlineCode2(state, node2) {
-    const text9 = { type: "text", value: node2.value.replace(/\r?\n|\r/g, " ") };
-    state.patch(node2, text9);
+    const text10 = { type: "text", value: node2.value.replace(/\r?\n|\r/g, " ") };
+    state.patch(node2, text10);
     const result = {
       type: "element",
       tagName: "code",
       properties: {},
-      children: [text9]
+      children: [text10]
     };
     state.patch(node2, result);
     return state.applyData(node2, result);
@@ -11160,14 +11160,14 @@ var UnifiedRenderer = (() => {
     if (!definition3) {
       return revert(state, node2);
     }
-    const properties = { href: normalizeUri(definition3.url || "") };
+    const properties2 = { href: normalizeUri(definition3.url || "") };
     if (definition3.title !== null && definition3.title !== void 0) {
-      properties.title = definition3.title;
+      properties2.title = definition3.title;
     }
     const result = {
       type: "element",
       tagName: "a",
-      properties,
+      properties: properties2,
       children: state.all(node2)
     };
     state.patch(node2, result);
@@ -11182,14 +11182,14 @@ var UnifiedRenderer = (() => {
 
   // node_modules/mdast-util-to-hast/lib/handlers/link.js
   function link2(state, node2) {
-    const properties = { href: normalizeUri(node2.url) };
+    const properties2 = { href: normalizeUri(node2.url) };
     if (node2.title !== null && node2.title !== void 0) {
-      properties.title = node2.title;
+      properties2.title = node2.title;
     }
     const result = {
       type: "element",
       tagName: "a",
-      properties,
+      properties: properties2,
       children: state.all(node2)
     };
     state.patch(node2, result);
@@ -11205,8 +11205,8 @@ var UnifiedRenderer = (() => {
   function listItem2(state, node2, parent) {
     const results = state.all(node2);
     const loose = parent ? listLoose(parent) : listItemLoose(node2);
-    const properties = {};
-    const children = [];
+    const properties2 = {};
+    const children2 = [];
     if (typeof node2.checked === "boolean") {
       const head2 = results[0];
       let paragraph3;
@@ -11225,25 +11225,25 @@ var UnifiedRenderer = (() => {
         properties: { type: "checkbox", checked: node2.checked, disabled: true },
         children: []
       });
-      properties.className = ["task-list-item"];
+      properties2.className = ["task-list-item"];
     }
     let index2 = -1;
     while (++index2 < results.length) {
       const child = results[index2];
       if (loose || index2 !== 0 || child.type !== "element" || child.tagName !== "p") {
-        children.push({ type: "text", value: "\n" });
+        children2.push({ type: "text", value: "\n" });
       }
       if (child.type === "element" && child.tagName === "p" && !loose) {
-        children.push(...child.children);
+        children2.push(...child.children);
       } else {
-        children.push(child);
+        children2.push(child);
       }
     }
     const tail = results[results.length - 1];
     if (tail && (loose || tail.type !== "element" || tail.tagName !== "p")) {
-      children.push({ type: "text", value: "\n" });
+      children2.push({ type: "text", value: "\n" });
     }
-    const result = { type: "element", tagName: "li", properties, children };
+    const result = { type: "element", tagName: "li", properties: properties2, children: children2 };
     state.patch(node2, result);
     return state.applyData(node2, result);
   }
@@ -11251,10 +11251,10 @@ var UnifiedRenderer = (() => {
     let loose = false;
     if (node2.type === "list") {
       loose = node2.spread || false;
-      const children = node2.children;
+      const children2 = node2.children;
       let index2 = -1;
-      while (!loose && ++index2 < children.length) {
-        loose = listItemLoose(children[index2]);
+      while (!loose && ++index2 < children2.length) {
+        loose = listItemLoose(children2[index2]);
       }
     }
     return loose;
@@ -11270,23 +11270,23 @@ var UnifiedRenderer = (() => {
 
   // node_modules/mdast-util-to-hast/lib/handlers/list.js
   function list3(state, node2) {
-    const properties = {};
+    const properties2 = {};
     const results = state.all(node2);
     let index2 = -1;
     if (typeof node2.start === "number" && node2.start !== 1) {
-      properties.start = node2.start;
+      properties2.start = node2.start;
     }
     while (++index2 < results.length) {
       const child = results[index2];
       if (child.type === "element" && child.tagName === "li" && child.properties && Array.isArray(child.properties.className) && child.properties.className.includes("task-list-item")) {
-        properties.className = ["contains-task-list"];
+        properties2.className = ["contains-task-list"];
         break;
       }
     }
     const result = {
       type: "element",
       tagName: node2.ordered ? "ol" : "ul",
-      properties,
+      properties: properties2,
       children: state.wrap(results, true)
     };
     state.patch(node2, result);
@@ -11429,12 +11429,12 @@ var UnifiedRenderer = (() => {
     const cells2 = [];
     while (++cellIndex < length) {
       const cell = node2.children[cellIndex];
-      const properties = {};
+      const properties2 = {};
       const alignValue = align ? align[cellIndex] : void 0;
       if (alignValue) {
-        properties.align = alignValue;
+        properties2.align = alignValue;
       }
-      let result2 = { type: "element", tagName, properties, children: [] };
+      let result2 = { type: "element", tagName, properties: properties2, children: [] };
       if (cell) {
         result2.children = state.all(cell);
         state.patch(cell, result2);
@@ -11906,9 +11906,9 @@ var UnifiedRenderer = (() => {
         if (backReferences.length > 0) {
           backReferences.push({ type: "text", value: " " });
         }
-        let children = typeof footnoteBackContent === "string" ? footnoteBackContent : footnoteBackContent(referenceIndex, rereferenceIndex);
-        if (typeof children === "string") {
-          children = { type: "text", value: children };
+        let children2 = typeof footnoteBackContent === "string" ? footnoteBackContent : footnoteBackContent(referenceIndex, rereferenceIndex);
+        if (typeof children2 === "string") {
+          children2 = { type: "text", value: children2 };
         }
         backReferences.push({
           type: "element",
@@ -11919,7 +11919,7 @@ var UnifiedRenderer = (() => {
             ariaLabel: typeof footnoteBackLabel === "string" ? footnoteBackLabel : footnoteBackLabel(referenceIndex, rereferenceIndex),
             className: ["data-footnote-backref"]
           },
-          children: Array.isArray(children) ? children : [children]
+          children: Array.isArray(children2) ? children2 : [children2]
         });
       }
       const tail = content3[content3.length - 1];
@@ -12016,7 +12016,7 @@ var UnifiedRenderer = (() => {
       }
       if (state.options.passThrough && state.options.passThrough.includes(type)) {
         if ("children" in node2) {
-          const { children, ...shallow } = node2;
+          const { children: children2, ...shallow } = node2;
           const result = esm_default(shallow);
           result.children = state.all(node2);
           return result;
@@ -12069,8 +12069,8 @@ var UnifiedRenderer = (() => {
         if (result.type === "element") {
           result.tagName = hName;
         } else {
-          const children = "children" in result ? result.children : [result];
-          result = { type: "element", tagName: hName, properties: {}, children };
+          const children2 = "children" in result ? result.children : [result];
+          result = { type: "element", tagName: hName, properties: {}, children: children2 };
         }
       }
       if (result.type === "element" && hProperties) {
@@ -12357,7 +12357,7 @@ var UnifiedRenderer = (() => {
 
   // node_modules/property-information/lib/util/create.js
   function create(definition3) {
-    const properties = {};
+    const properties2 = {};
     const normals = {};
     for (const [property, value] of Object.entries(definition3.properties)) {
       const info = new DefinedInfo(
@@ -12369,11 +12369,11 @@ var UnifiedRenderer = (() => {
       if (definition3.mustUseProperty && definition3.mustUseProperty.includes(property)) {
         info.mustUseProperty = true;
       }
-      properties[property] = info;
+      properties2[property] = info;
       normals[normalize2(property)] = property;
       normals[normalize2(info.attribute)] = property;
     }
-    return new Schema(properties, normals, definition3.space);
+    return new Schema(properties2, normals, definition3.space);
   }
   var init_create = __esm({
     "node_modules/property-information/lib/util/create.js"() {
@@ -13635,29 +13635,29 @@ var UnifiedRenderer = (() => {
   // node_modules/hastscript/lib/create-h.js
   function createH(schema, defaultTagName, caseSensitive) {
     const adjust = caseSensitive ? createAdjustMap(caseSensitive) : void 0;
-    function h2(selector, properties, ...children) {
+    function h2(selector, properties2, ...children2) {
       let node2;
       if (selector === null || selector === void 0) {
         node2 = { type: "root", children: [] };
         const child = (
           /** @type {Child} */
-          properties
+          properties2
         );
-        children.unshift(child);
+        children2.unshift(child);
       } else {
         node2 = parseSelector(selector, defaultTagName);
         const lower = node2.tagName.toLowerCase();
         const adjusted = adjust ? adjust.get(lower) : void 0;
         node2.tagName = adjusted || lower;
-        if (isChild(properties)) {
-          children.unshift(properties);
+        if (isChild(properties2)) {
+          children2.unshift(properties2);
         } else {
-          for (const [key2, value] of Object.entries(properties)) {
+          for (const [key2, value] of Object.entries(properties2)) {
             addProperty(schema, node2.properties, key2, value);
           }
         }
       }
-      for (const child of children) {
+      for (const child of children2) {
         addChild(node2.children, child);
       }
       if (node2.type === "element" && node2.tagName === "template") {
@@ -13698,7 +13698,7 @@ var UnifiedRenderer = (() => {
     }
     return false;
   }
-  function addProperty(schema, properties, key2, value) {
+  function addProperty(schema, properties2, key2, value) {
     const info = find(schema, key2);
     let result;
     if (value === null || value === void 0) return;
@@ -13732,13 +13732,13 @@ var UnifiedRenderer = (() => {
       }
       result = finalResult;
     }
-    if (info.property === "className" && Array.isArray(properties.className)) {
-      result = properties.className.concat(
+    if (info.property === "className" && Array.isArray(properties2.className)) {
+      result = properties2.className.concat(
         /** @type {Array<number | string> | number | string} */
         result
       );
     }
-    properties[info.property] = result;
+    properties2[info.property] = result;
   }
   function addChild(nodes, value) {
     if (value === null || value === void 0) {
@@ -14026,16 +14026,16 @@ var UnifiedRenderer = (() => {
     const schema = state.schema;
     state.schema = node2.namespaceURI === webNamespaces.svg ? svg2 : html4;
     let index2 = -1;
-    const properties = {};
+    const properties2 = {};
     while (++index2 < node2.attrs.length) {
       const attribute = node2.attrs[index2];
       const name = (attribute.prefix ? attribute.prefix + ":" : "") + attribute.name;
       if (!own5.call(proto, name)) {
-        properties[name] = attribute.value;
+        properties2[name] = attribute.value;
       }
     }
     const x = state.schema.space === "svg" ? s : h;
-    const result = x(node2.tagName, properties, all2(state, node2.childNodes));
+    const result = x(node2.tagName, properties2, all2(state, node2.childNodes));
     patch2(state, node2, result);
     if (result.tagName === "template") {
       const reference = (
@@ -14074,12 +14074,12 @@ var UnifiedRenderer = (() => {
         result.end = Object.assign({}, tail.position.end);
       }
       if (state.verbose) {
-        const properties = {};
+        const properties2 = {};
         let key2;
         if (location2.attrs) {
           for (key2 in location2.attrs) {
             if (own5.call(location2.attrs, key2)) {
-              properties[find(state.schema, key2).property] = position3(
+              properties2[find(state.schema, key2).property] = position3(
                 location2.attrs[key2]
               );
             }
@@ -14090,7 +14090,7 @@ var UnifiedRenderer = (() => {
         const closing2 = location2.endTag ? position3(location2.endTag) : void 0;
         const data = { opening: opening2 };
         if (closing2) data.closing = closing2;
-        data.properties = properties;
+        data.properties = properties2;
         node2.data = { position: data };
       }
     }
@@ -14248,12 +14248,12 @@ var UnifiedRenderer = (() => {
     }
     return attribute;
   }
-  function all3(children, parentNode, schema) {
+  function all3(children2, parentNode, schema) {
     let index2 = -1;
     const results = [];
-    if (children) {
-      while (++index2 < children.length) {
-        const child = one3(children[index2], schema);
+    if (children2) {
+      while (++index2 < children2.length) {
+        const child = one3(children2[index2], schema);
         child.parentNode = parentNode;
         results.push(child);
       }
@@ -18316,8 +18316,8 @@ var UnifiedRenderer = (() => {
           this.current = document4;
         }
         //Index of element
-        _indexOf(element6) {
-          return this.items.lastIndexOf(element6, this.stackTop);
+        _indexOf(element7) {
+          return this.items.lastIndexOf(element7, this.stackTop);
         }
         //Update current element
         _isInTemplate() {
@@ -18328,16 +18328,16 @@ var UnifiedRenderer = (() => {
           this.currentTagId = this.tagIDs[this.stackTop];
         }
         //Mutations
-        push(element6, tagID) {
+        push(element7, tagID) {
           this.stackTop++;
-          this.items[this.stackTop] = element6;
-          this.current = element6;
+          this.items[this.stackTop] = element7;
+          this.current = element7;
           this.tagIDs[this.stackTop] = tagID;
           this.currentTagId = tagID;
           if (this._isInTemplate()) {
             this.tmplCount++;
           }
-          this.handler.onItemPush(element6, tagID, true);
+          this.handler.onItemPush(element7, tagID, true);
         }
         pop() {
           const popped = this.current;
@@ -18385,8 +18385,8 @@ var UnifiedRenderer = (() => {
             this.handler.onItemPop(popped, this.stackTop < idx);
           }
         }
-        popUntilElementPopped(element6) {
-          const idx = this._indexOf(element6);
+        popUntilElementPopped(element7) {
+          const idx = this._indexOf(element7);
           this.shortenToLength(Math.max(idx, 0));
         }
         popUntilPopped(tagNames, targetNS) {
@@ -18424,8 +18424,8 @@ var UnifiedRenderer = (() => {
         clearBackToTableRowContext() {
           this.clearBackTo(TABLE_ROW_CONTEXT, NS.HTML);
         }
-        remove(element6) {
-          const idx = this._indexOf(element6);
+        remove(element7) {
+          const idx = this._indexOf(element7);
           if (idx >= 0) {
             if (idx === this.stackTop) {
               this.pop();
@@ -18434,7 +18434,7 @@ var UnifiedRenderer = (() => {
               this.tagIDs.splice(idx, 1);
               this.stackTop--;
               this._updateCurrentElement();
-              this.handler.onItemPop(element6, false);
+              this.handler.onItemPop(element7, false);
             }
           }
         }
@@ -18442,11 +18442,11 @@ var UnifiedRenderer = (() => {
         tryPeekProperlyNestedBodyElement() {
           return this.stackTop >= 1 && this.tagIDs[1] === TAG_ID.BODY ? this.items[1] : null;
         }
-        contains(element6) {
-          return this._indexOf(element6) > -1;
+        contains(element7) {
+          return this._indexOf(element7) > -1;
         }
-        getCommonAncestor(element6) {
-          const elementIdx = this._indexOf(element6) - 1;
+        getCommonAncestor(element7) {
+          const elementIdx = this._indexOf(element7) - 1;
           return elementIdx >= 0 ? this.items[elementIdx] : null;
         }
         isRootHtmlElementCurrent() {
@@ -18617,9 +18617,9 @@ var UnifiedRenderer = (() => {
             if (entry.type === EntryType.Marker) {
               break;
             }
-            const { element: element6 } = entry;
-            if (this.treeAdapter.getTagName(element6) === neTagName && this.treeAdapter.getNamespaceURI(element6) === neNamespaceURI) {
-              const elementAttrs = this.treeAdapter.getAttrList(element6);
+            const { element: element7 } = entry;
+            if (this.treeAdapter.getTagName(element7) === neTagName && this.treeAdapter.getNamespaceURI(element7) === neNamespaceURI) {
+              const elementAttrs = this.treeAdapter.getAttrList(element7);
               if (elementAttrs.length === neAttrsLength) {
                 candidates.push({ idx: i, attrs: elementAttrs });
               }
@@ -18650,19 +18650,19 @@ var UnifiedRenderer = (() => {
         insertMarker() {
           this.entries.unshift(MARKER);
         }
-        pushElement(element6, token) {
-          this._ensureNoahArkCondition(element6);
+        pushElement(element7, token) {
+          this._ensureNoahArkCondition(element7);
           this.entries.unshift({
             type: EntryType.Element,
-            element: element6,
+            element: element7,
             token
           });
         }
-        insertElementAfterBookmark(element6, token) {
+        insertElementAfterBookmark(element7, token) {
           const bookmarkIdx = this.entries.indexOf(this.bookmark);
           this.entries.splice(bookmarkIdx, 0, {
             type: EntryType.Element,
-            element: element6,
+            element: element7,
             token
           });
         }
@@ -18690,8 +18690,8 @@ var UnifiedRenderer = (() => {
           const entry = this.entries.find((entry2) => entry2.type === EntryType.Marker || this.treeAdapter.getTagName(entry2.element) === tagName);
           return entry && entry.type === EntryType.Element ? entry : null;
         }
-        getElementEntry(element6) {
-          return this.entries.find((entry) => entry.type === EntryType.Element && entry.element === element6);
+        getElementEntry(element7) {
+          return this.entries.find((entry) => entry.type === EntryType.Element && entry.element === element7);
         }
       };
     }
@@ -18787,22 +18787,22 @@ var UnifiedRenderer = (() => {
             node2.parentNode = null;
           }
         },
-        insertText(parentNode, text9) {
+        insertText(parentNode, text10) {
           if (parentNode.childNodes.length > 0) {
             const prevNode = parentNode.childNodes[parentNode.childNodes.length - 1];
             if (defaultTreeAdapter.isTextNode(prevNode)) {
-              prevNode.value += text9;
+              prevNode.value += text10;
               return;
             }
           }
-          defaultTreeAdapter.appendChild(parentNode, defaultTreeAdapter.createTextNode(text9));
+          defaultTreeAdapter.appendChild(parentNode, defaultTreeAdapter.createTextNode(text10));
         },
-        insertTextBefore(parentNode, text9, referenceNode) {
+        insertTextBefore(parentNode, text10, referenceNode) {
           const prevNode = parentNode.childNodes[parentNode.childNodes.indexOf(referenceNode) - 1];
           if (prevNode && defaultTreeAdapter.isTextNode(prevNode)) {
-            prevNode.value += text9;
+            prevNode.value += text10;
           } else {
-            defaultTreeAdapter.insertBefore(parentNode, defaultTreeAdapter.createTextNode(text9), referenceNode);
+            defaultTreeAdapter.insertBefore(parentNode, defaultTreeAdapter.createTextNode(text10), referenceNode);
           }
         },
         adoptAttributes(recipient, attrs) {
@@ -18823,15 +18823,15 @@ var UnifiedRenderer = (() => {
         getParentNode(node2) {
           return node2.parentNode;
         },
-        getAttrList(element6) {
-          return element6.attrs;
+        getAttrList(element7) {
+          return element7.attrs;
         },
         //Node data
-        getTagName(element6) {
-          return element6.tagName;
+        getTagName(element7) {
+          return element7.tagName;
         },
-        getNamespaceURI(element6) {
-          return element6.namespaceURI;
+        getNamespaceURI(element7) {
+          return element7.namespaceURI;
         },
         getTextNodeContent(textNode) {
           return textNode.value;
@@ -19235,12 +19235,12 @@ var UnifiedRenderer = (() => {
     let furthestBlock = null;
     let idx = p2.openElements.stackTop;
     for (; idx >= 0; idx--) {
-      const element6 = p2.openElements.items[idx];
-      if (element6 === formattingElementEntry.element) {
+      const element7 = p2.openElements.items[idx];
+      if (element7 === formattingElementEntry.element) {
         break;
       }
-      if (p2._isSpecialElement(element6, p2.openElements.tagIDs[idx])) {
-        furthestBlock = element6;
+      if (p2._isSpecialElement(element7, p2.openElements.tagIDs[idx])) {
+        furthestBlock = element7;
       }
     }
     if (!furthestBlock) {
@@ -19252,24 +19252,24 @@ var UnifiedRenderer = (() => {
   function aaInnerLoop(p2, furthestBlock, formattingElement) {
     let lastElement = furthestBlock;
     let nextElement = p2.openElements.getCommonAncestor(furthestBlock);
-    for (let i = 0, element6 = nextElement; element6 !== formattingElement; i++, element6 = nextElement) {
-      nextElement = p2.openElements.getCommonAncestor(element6);
-      const elementEntry = p2.activeFormattingElements.getElementEntry(element6);
+    for (let i = 0, element7 = nextElement; element7 !== formattingElement; i++, element7 = nextElement) {
+      nextElement = p2.openElements.getCommonAncestor(element7);
+      const elementEntry = p2.activeFormattingElements.getElementEntry(element7);
       const counterOverflow = elementEntry && i >= AA_INNER_LOOP_ITER;
       const shouldRemoveFromOpenElements = !elementEntry || counterOverflow;
       if (shouldRemoveFromOpenElements) {
         if (counterOverflow) {
           p2.activeFormattingElements.removeEntry(elementEntry);
         }
-        p2.openElements.remove(element6);
+        p2.openElements.remove(element7);
       } else {
-        element6 = aaRecreateElementFromEntry(p2, elementEntry);
+        element7 = aaRecreateElementFromEntry(p2, elementEntry);
         if (lastElement === furthestBlock) {
           p2.activeFormattingElements.bookmark = elementEntry;
         }
         p2.treeAdapter.detachNode(lastElement);
-        p2.treeAdapter.appendChild(element6, lastElement);
-        lastElement = element6;
+        p2.treeAdapter.appendChild(element7, lastElement);
+        lastElement = element7;
       }
     }
     return lastElement;
@@ -20203,15 +20203,15 @@ var UnifiedRenderer = (() => {
     const tn = token.tagName;
     const tid = token.tagID;
     for (let i = p2.openElements.stackTop; i > 0; i--) {
-      const element6 = p2.openElements.items[i];
+      const element7 = p2.openElements.items[i];
       const elementId = p2.openElements.tagIDs[i];
-      if (tid === elementId && (tid !== TAG_ID.UNKNOWN || p2.treeAdapter.getTagName(element6) === tn)) {
+      if (tid === elementId && (tid !== TAG_ID.UNKNOWN || p2.treeAdapter.getTagName(element7) === tn)) {
         p2.openElements.generateImpliedEndTagsWithExclusion(tid);
         if (p2.openElements.stackTop >= i)
           p2.openElements.shortenToLength(i);
         break;
       }
-      if (p2._isSpecialElement(element6, elementId)) {
+      if (p2._isSpecialElement(element7, elementId)) {
         break;
       }
     }
@@ -21123,12 +21123,12 @@ var UnifiedRenderer = (() => {
       return;
     }
     for (let i = p2.openElements.stackTop; i > 0; i--) {
-      const element6 = p2.openElements.items[i];
-      if (p2.treeAdapter.getNamespaceURI(element6) === NS.HTML) {
+      const element7 = p2.openElements.items[i];
+      if (p2.treeAdapter.getNamespaceURI(element7) === NS.HTML) {
         p2._endTagOutsideForeignContent(token);
         break;
       }
-      const tagName = p2.treeAdapter.getTagName(element6);
+      const tagName = p2.treeAdapter.getTagName(element7);
       if (tagName.toLowerCase() === token.tagName) {
         token.tagName = tagName;
         p2.openElements.shortenToLength(i);
@@ -21378,19 +21378,19 @@ var UnifiedRenderer = (() => {
           }
         }
         /** @protected */
-        _attachElementToTree(element6, location2) {
+        _attachElementToTree(element7, location2) {
           if (this.options.sourceCodeLocationInfo) {
             const loc = location2 && {
               ...location2,
               startTag: location2
             };
-            this.treeAdapter.setNodeSourceCodeLocation(element6, loc);
+            this.treeAdapter.setNodeSourceCodeLocation(element7, loc);
           }
           if (this._shouldFosterParentOnInsertion()) {
-            this._fosterParentElement(element6);
+            this._fosterParentElement(element7);
           } else {
             const parent = this.openElements.currentTmplContentOrNode;
-            this.treeAdapter.appendChild(parent !== null && parent !== void 0 ? parent : this.document, element6);
+            this.treeAdapter.appendChild(parent !== null && parent !== void 0 ? parent : this.document, element7);
           }
         }
         /**
@@ -21399,20 +21399,20 @@ var UnifiedRenderer = (() => {
          */
         /** @protected */
         _appendElement(token, namespaceURI) {
-          const element6 = this.treeAdapter.createElement(token.tagName, namespaceURI, token.attrs);
-          this._attachElementToTree(element6, token.location);
+          const element7 = this.treeAdapter.createElement(token.tagName, namespaceURI, token.attrs);
+          this._attachElementToTree(element7, token.location);
         }
         /** @protected */
         _insertElement(token, namespaceURI) {
-          const element6 = this.treeAdapter.createElement(token.tagName, namespaceURI, token.attrs);
-          this._attachElementToTree(element6, token.location);
-          this.openElements.push(element6, token.tagID);
+          const element7 = this.treeAdapter.createElement(token.tagName, namespaceURI, token.attrs);
+          this._attachElementToTree(element7, token.location);
+          this.openElements.push(element7, token.tagID);
         }
         /** @protected */
         _insertFakeElement(tagName, tagID) {
-          const element6 = this.treeAdapter.createElement(tagName, NS.HTML, []);
-          this._attachElementToTree(element6, null);
-          this.openElements.push(element6, tagID);
+          const element7 = this.treeAdapter.createElement(tagName, NS.HTML, []);
+          this._attachElementToTree(element7, null);
+          this.openElements.push(element7, tagID);
         }
         /** @protected */
         _insertTemplate(token) {
@@ -21426,11 +21426,11 @@ var UnifiedRenderer = (() => {
         }
         /** @protected */
         _insertFakeRootElement() {
-          const element6 = this.treeAdapter.createElement(TAG_NAMES.HTML, NS.HTML, []);
+          const element7 = this.treeAdapter.createElement(TAG_NAMES.HTML, NS.HTML, []);
           if (this.options.sourceCodeLocationInfo)
-            this.treeAdapter.setNodeSourceCodeLocation(element6, null);
-          this.treeAdapter.appendChild(this.openElements.current, element6);
-          this.openElements.push(element6, TAG_ID.HTML);
+            this.treeAdapter.setNodeSourceCodeLocation(element7, null);
+          this.treeAdapter.appendChild(this.openElements.current, element7);
+          this.openElements.push(element7, TAG_ID.HTML);
         }
         /** @protected */
         _appendCommentNode(token, parent) {
@@ -21476,10 +21476,10 @@ var UnifiedRenderer = (() => {
           }
         }
         /** @protected */
-        _setEndLocation(element6, closingToken) {
-          if (this.treeAdapter.getNodeSourceCodeLocation(element6) && closingToken.location) {
+        _setEndLocation(element7, closingToken) {
+          if (this.treeAdapter.getNodeSourceCodeLocation(element7) && closingToken.location) {
             const ctLoc = closingToken.location;
-            const tn = this.treeAdapter.getTagName(element6);
+            const tn = this.treeAdapter.getTagName(element7);
             const endLoc = (
               // NOTE: For cases like <p> <p> </p> - First 'p' closes without a closing
               // tag and for cases like <td> <p> </td> - 'p' closes without a closing tag.
@@ -21494,7 +21494,7 @@ var UnifiedRenderer = (() => {
                 endOffset: ctLoc.startOffset
               }
             );
-            this.treeAdapter.updateNodeSourceCodeLocation(element6, endLoc);
+            this.treeAdapter.updateNodeSourceCodeLocation(element7, endLoc);
           }
         }
         //Token processing
@@ -21558,9 +21558,9 @@ var UnifiedRenderer = (() => {
         }
         //Integration points
         /** @protected */
-        _isIntegrationPoint(tid, element6, foreignNS) {
-          const ns = this.treeAdapter.getNamespaceURI(element6);
-          const attrs = this.treeAdapter.getAttrList(element6);
+        _isIntegrationPoint(tid, element7, foreignNS) {
+          const ns = this.treeAdapter.getNamespaceURI(element7);
+          const attrs = this.treeAdapter.getAttrList(element7);
           return isIntegrationPoint(tid, ns, attrs, foreignNS);
         }
         //Active formatting elements reconstruction
@@ -21704,18 +21704,18 @@ var UnifiedRenderer = (() => {
           return { parent: this.openElements.items[0], beforeElement: null };
         }
         /** @protected */
-        _fosterParentElement(element6) {
+        _fosterParentElement(element7) {
           const location2 = this._findFosterParentingLocation();
           if (location2.beforeElement) {
-            this.treeAdapter.insertBefore(location2.parent, element6, location2.beforeElement);
+            this.treeAdapter.insertBefore(location2.parent, element7, location2.beforeElement);
           } else {
-            this.treeAdapter.appendChild(location2.parent, element6);
+            this.treeAdapter.appendChild(location2.parent, element7);
           }
         }
         //Special elements
         /** @protected */
-        _isSpecialElement(element6, id) {
-          const ns = this.treeAdapter.getNamespaceURI(element6);
+        _isSpecialElement(element7, id) {
+          const ns = this.treeAdapter.getNamespaceURI(element7);
           return SPECIAL_ELEMENTS[ns].has(id);
         }
         /** @internal */
@@ -22638,6 +22638,521 @@ var UnifiedRenderer = (() => {
     }
   });
 
+  // node_modules/hast-util-sanitize/lib/schema.js
+  var aria2, defaultSchema;
+  var init_schema2 = __esm({
+    "node_modules/hast-util-sanitize/lib/schema.js"() {
+      aria2 = ["ariaDescribedBy", "ariaLabel", "ariaLabelledBy"];
+      defaultSchema = {
+        ancestors: {
+          tbody: ["table"],
+          td: ["table"],
+          th: ["table"],
+          thead: ["table"],
+          tfoot: ["table"],
+          tr: ["table"]
+        },
+        attributes: {
+          a: [
+            ...aria2,
+            // Note: these 3 are used by GFM footnotes, they do work on all links.
+            "dataFootnoteBackref",
+            "dataFootnoteRef",
+            ["className", "data-footnote-backref"],
+            "href"
+          ],
+          blockquote: ["cite"],
+          // Note: this class is not normally allowed by GH, when manually writing
+          // `code` as HTML in markdown, they adds it some other way.
+          // We can’t do that, so we have to allow it.
+          code: [["className", /^language-./]],
+          del: ["cite"],
+          div: ["itemScope", "itemType"],
+          dl: [...aria2],
+          // Note: this is used by GFM footnotes.
+          h2: [["className", "sr-only"]],
+          img: [...aria2, "longDesc", "src"],
+          // Note: `input` is not normally allowed by GH, when manually writing
+          // it in markdown, they add it from tasklists some other way.
+          // We can’t do that, so we have to allow it.
+          input: [
+            ["disabled", true],
+            ["type", "checkbox"]
+          ],
+          ins: ["cite"],
+          // Note: this class is not normally allowed by GH, when manually writing
+          // `li` as HTML in markdown, they adds it some other way.
+          // We can’t do that, so we have to allow it.
+          li: [["className", "task-list-item"]],
+          // Note: this class is not normally allowed by GH, when manually writing
+          // `ol` as HTML in markdown, they adds it some other way.
+          // We can’t do that, so we have to allow it.
+          ol: [...aria2, ["className", "contains-task-list"]],
+          q: ["cite"],
+          section: ["dataFootnotes", ["className", "footnotes"]],
+          source: ["srcSet"],
+          summary: [...aria2],
+          table: [...aria2],
+          // Note: this class is not normally allowed by GH, when manually writing
+          // `ol` as HTML in markdown, they adds it some other way.
+          // We can’t do that, so we have to allow it.
+          ul: [...aria2, ["className", "contains-task-list"]],
+          "*": [
+            "abbr",
+            "accept",
+            "acceptCharset",
+            "accessKey",
+            "action",
+            "align",
+            "alt",
+            "axis",
+            "border",
+            "cellPadding",
+            "cellSpacing",
+            "char",
+            "charOff",
+            "charSet",
+            "checked",
+            "clear",
+            "colSpan",
+            "color",
+            "cols",
+            "compact",
+            "coords",
+            "dateTime",
+            "dir",
+            // Note: `disabled` is technically allowed on all elements by GH.
+            // But it is useless on everything except `input`.
+            // Because `input`s are normally not allowed, but we allow them for
+            // checkboxes due to tasklists, we allow `disabled` only there.
+            "encType",
+            "frame",
+            "hSpace",
+            "headers",
+            "height",
+            "hrefLang",
+            "htmlFor",
+            "id",
+            "isMap",
+            "itemProp",
+            "label",
+            "lang",
+            "maxLength",
+            "media",
+            "method",
+            "multiple",
+            "name",
+            "noHref",
+            "noShade",
+            "noWrap",
+            "open",
+            "prompt",
+            "readOnly",
+            "rev",
+            "rowSpan",
+            "rows",
+            "rules",
+            "scope",
+            "selected",
+            "shape",
+            "size",
+            "span",
+            "start",
+            "summary",
+            "tabIndex",
+            "title",
+            "useMap",
+            "vAlign",
+            "value",
+            "width"
+          ]
+        },
+        clobber: ["ariaDescribedBy", "ariaLabelledBy", "id", "name"],
+        clobberPrefix: "user-content-",
+        protocols: {
+          cite: ["http", "https"],
+          href: ["http", "https", "irc", "ircs", "mailto", "xmpp"],
+          longDesc: ["http", "https"],
+          src: ["http", "https"]
+        },
+        required: {
+          input: { disabled: true, type: "checkbox" }
+        },
+        strip: ["script"],
+        tagNames: [
+          "a",
+          "b",
+          "blockquote",
+          "br",
+          "code",
+          "dd",
+          "del",
+          "details",
+          "div",
+          "dl",
+          "dt",
+          "em",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "hr",
+          "i",
+          "img",
+          // Note: `input` is not normally allowed by GH, when manually writing
+          // it in markdown, they add it from tasklists some other way.
+          // We can’t do that, so we have to allow it.
+          "input",
+          "ins",
+          "kbd",
+          "li",
+          "ol",
+          "p",
+          "picture",
+          "pre",
+          "q",
+          "rp",
+          "rt",
+          "ruby",
+          "s",
+          "samp",
+          "section",
+          "source",
+          "span",
+          "strike",
+          "strong",
+          "sub",
+          "summary",
+          "sup",
+          "table",
+          "tbody",
+          "td",
+          "tfoot",
+          "th",
+          "thead",
+          "tr",
+          "tt",
+          "ul",
+          "var"
+        ]
+      };
+    }
+  });
+
+  // node_modules/hast-util-sanitize/lib/index.js
+  function sanitize(node2, options) {
+    let result = { type: "root", children: [] };
+    const state = {
+      schema: options ? { ...defaultSchema, ...options } : defaultSchema,
+      stack: []
+    };
+    const replace2 = transform(state, node2);
+    if (replace2) {
+      if (Array.isArray(replace2)) {
+        if (replace2.length === 1) {
+          result = replace2[0];
+        } else {
+          result.children = replace2;
+        }
+      } else {
+        result = replace2;
+      }
+    }
+    return result;
+  }
+  function transform(state, node2) {
+    if (node2 && typeof node2 === "object") {
+      const unsafe = (
+        /** @type {Record<string, Readonly<unknown>>} */
+        node2
+      );
+      const type = typeof unsafe.type === "string" ? unsafe.type : "";
+      switch (type) {
+        case "comment": {
+          return comment3(state, unsafe);
+        }
+        case "doctype": {
+          return doctype3(state, unsafe);
+        }
+        case "element": {
+          return element5(state, unsafe);
+        }
+        case "root": {
+          return root5(state, unsafe);
+        }
+        case "text": {
+          return text8(state, unsafe);
+        }
+        default:
+      }
+    }
+  }
+  function comment3(state, unsafe) {
+    if (state.schema.allowComments) {
+      const result = typeof unsafe.value === "string" ? unsafe.value : "";
+      const index2 = result.indexOf("-->");
+      const value = index2 < 0 ? result : result.slice(0, index2);
+      const node2 = { type: "comment", value };
+      patch4(node2, unsafe);
+      return node2;
+    }
+  }
+  function doctype3(state, unsafe) {
+    if (state.schema.allowDoctypes) {
+      const node2 = { type: "doctype" };
+      patch4(node2, unsafe);
+      return node2;
+    }
+  }
+  function element5(state, unsafe) {
+    const name = typeof unsafe.tagName === "string" ? unsafe.tagName : "";
+    state.stack.push(name);
+    const content3 = (
+      /** @type {Array<ElementContent>} */
+      children(state, unsafe.children)
+    );
+    const properties_ = properties(state, unsafe.properties);
+    state.stack.pop();
+    let safeElement = false;
+    if (name && name !== "*" && (!state.schema.tagNames || state.schema.tagNames.includes(name))) {
+      safeElement = true;
+      if (state.schema.ancestors && own7.call(state.schema.ancestors, name)) {
+        const ancestors = state.schema.ancestors[name];
+        let index2 = -1;
+        safeElement = false;
+        while (++index2 < ancestors.length) {
+          if (state.stack.includes(ancestors[index2])) {
+            safeElement = true;
+          }
+        }
+      }
+    }
+    if (!safeElement) {
+      return state.schema.strip && !state.schema.strip.includes(name) ? content3 : void 0;
+    }
+    const node2 = {
+      type: "element",
+      tagName: name,
+      properties: properties_,
+      children: content3
+    };
+    patch4(node2, unsafe);
+    return node2;
+  }
+  function root5(state, unsafe) {
+    const content3 = (
+      /** @type {Array<RootContent>} */
+      children(state, unsafe.children)
+    );
+    const node2 = { type: "root", children: content3 };
+    patch4(node2, unsafe);
+    return node2;
+  }
+  function text8(_, unsafe) {
+    const value = typeof unsafe.value === "string" ? unsafe.value : "";
+    const node2 = { type: "text", value };
+    patch4(node2, unsafe);
+    return node2;
+  }
+  function children(state, children2) {
+    const results = [];
+    if (Array.isArray(children2)) {
+      const childrenUnknown = (
+        /** @type {Array<Readonly<unknown>>} */
+        children2
+      );
+      let index2 = -1;
+      while (++index2 < childrenUnknown.length) {
+        const value = transform(state, childrenUnknown[index2]);
+        if (value) {
+          if (Array.isArray(value)) {
+            results.push(...value);
+          } else {
+            results.push(value);
+          }
+        }
+      }
+    }
+    return results;
+  }
+  function properties(state, properties2) {
+    const tagName = state.stack[state.stack.length - 1];
+    const attributes = state.schema.attributes;
+    const required = state.schema.required;
+    const specific = attributes && own7.call(attributes, tagName) ? attributes[tagName] : void 0;
+    const defaults = attributes && own7.call(attributes, "*") ? attributes["*"] : void 0;
+    const properties_ = (
+      /** @type {Readonly<Record<string, Readonly<unknown>>>} */
+      properties2 && typeof properties2 === "object" ? properties2 : {}
+    );
+    const result = {};
+    let key2;
+    for (key2 in properties_) {
+      if (own7.call(properties_, key2)) {
+        const unsafe = properties_[key2];
+        let safe = propertyValue(
+          state,
+          findDefinition(specific, key2),
+          key2,
+          unsafe
+        );
+        if (safe === null || safe === void 0) {
+          safe = propertyValue(state, findDefinition(defaults, key2), key2, unsafe);
+        }
+        if (safe !== null && safe !== void 0) {
+          result[key2] = safe;
+        }
+      }
+    }
+    if (required && own7.call(required, tagName)) {
+      const properties3 = required[tagName];
+      for (key2 in properties3) {
+        if (own7.call(properties3, key2) && !own7.call(result, key2)) {
+          result[key2] = properties3[key2];
+        }
+      }
+    }
+    return result;
+  }
+  function propertyValue(state, definition3, key2, value) {
+    return definition3 ? Array.isArray(value) ? propertyValueMany(state, definition3, key2, value) : propertyValuePrimitive(state, definition3, key2, value) : void 0;
+  }
+  function propertyValueMany(state, definition3, key2, values) {
+    let index2 = -1;
+    const result = [];
+    while (++index2 < values.length) {
+      const value = propertyValuePrimitive(state, definition3, key2, values[index2]);
+      if (typeof value === "number" || typeof value === "string") {
+        result.push(value);
+      }
+    }
+    return result;
+  }
+  function propertyValuePrimitive(state, definition3, key2, value) {
+    if (typeof value !== "boolean" && typeof value !== "number" && typeof value !== "string") {
+      return;
+    }
+    if (!safeProtocol(state, key2, value)) {
+      return;
+    }
+    if (typeof definition3 === "object" && definition3.length > 1) {
+      let ok3 = false;
+      let index2 = 0;
+      while (++index2 < definition3.length) {
+        const allowed = definition3[index2];
+        if (allowed && typeof allowed === "object" && "flags" in allowed) {
+          if (allowed.test(String(value))) {
+            ok3 = true;
+            break;
+          }
+        } else if (allowed === value) {
+          ok3 = true;
+          break;
+        }
+      }
+      if (!ok3) return;
+    }
+    return state.schema.clobber && state.schema.clobberPrefix && state.schema.clobber.includes(key2) ? state.schema.clobberPrefix + value : value;
+  }
+  function safeProtocol(state, key2, value) {
+    const protocols = state.schema.protocols && own7.call(state.schema.protocols, key2) ? state.schema.protocols[key2] : void 0;
+    if (!protocols || protocols.length === 0) {
+      return true;
+    }
+    const url = String(value);
+    const colon = url.indexOf(":");
+    const questionMark = url.indexOf("?");
+    const numberSign = url.indexOf("#");
+    const slash = url.indexOf("/");
+    if (colon < 0 || // If the first colon is after a `?`, `#`, or `/`, it’s not a protocol.
+    slash > -1 && colon > slash || questionMark > -1 && colon > questionMark || numberSign > -1 && colon > numberSign) {
+      return true;
+    }
+    let index2 = -1;
+    while (++index2 < protocols.length) {
+      const protocol = protocols[index2];
+      if (colon === protocol.length && url.slice(0, protocol.length) === protocol) {
+        return true;
+      }
+    }
+    return false;
+  }
+  function patch4(node2, unsafe) {
+    const cleanPosition = position2(
+      // @ts-expect-error: looks like a node.
+      unsafe
+    );
+    if (unsafe.data) {
+      node2.data = esm_default(unsafe.data);
+    }
+    if (cleanPosition) node2.position = cleanPosition;
+  }
+  function findDefinition(definitions, key2) {
+    let dataDefault;
+    let index2 = -1;
+    if (definitions) {
+      while (++index2 < definitions.length) {
+        const entry = definitions[index2];
+        const name = typeof entry === "string" ? entry : entry[0];
+        if (name === key2) {
+          return entry;
+        }
+        if (name === "data*") dataDefault = entry;
+      }
+    }
+    if (key2.length > 4 && key2.slice(0, 4).toLowerCase() === "data") {
+      return dataDefault;
+    }
+  }
+  var own7;
+  var init_lib31 = __esm({
+    "node_modules/hast-util-sanitize/lib/index.js"() {
+      init_esm();
+      init_unist_util_position();
+      init_schema2();
+      own7 = {}.hasOwnProperty;
+    }
+  });
+
+  // node_modules/hast-util-sanitize/index.js
+  var init_hast_util_sanitize = __esm({
+    "node_modules/hast-util-sanitize/index.js"() {
+      init_lib31();
+      init_schema2();
+    }
+  });
+
+  // node_modules/rehype-sanitize/lib/index.js
+  function rehypeSanitize(options) {
+    return function(tree) {
+      const result = (
+        /** @type {Root} */
+        sanitize(tree, options)
+      );
+      return result;
+    };
+  }
+  var init_lib32 = __esm({
+    "node_modules/rehype-sanitize/lib/index.js"() {
+      init_hast_util_sanitize();
+    }
+  });
+
+  // node_modules/rehype-sanitize/index.js
+  var rehype_sanitize_exports = {};
+  __export(rehype_sanitize_exports, {
+    default: () => rehypeSanitize,
+    defaultSchema: () => defaultSchema
+  });
+  var init_rehype_sanitize = __esm({
+    "node_modules/rehype-sanitize/index.js"() {
+      init_hast_util_sanitize();
+      init_lib32();
+    }
+  });
+
   // node_modules/stringify-entities/lib/core.js
   function core(value, options) {
     value = value.replace(
@@ -23111,7 +23626,7 @@ var UnifiedRenderer = (() => {
   // node_modules/stringify-entities/lib/util/to-named.js
   function toNamed(code4, next2, omit, attribute) {
     const character = String.fromCharCode(code4);
-    if (own7.call(characters, character)) {
+    if (own8.call(characters, character)) {
       const name = characters[character];
       const value = "&" + name;
       if (omit && characterEntitiesLegacy.includes(name) && !dangerous.includes(name) && (!attribute || next2 && next2 !== 61 && notAlphanumericRegex.test(String.fromCharCode(next2)))) {
@@ -23121,16 +23636,16 @@ var UnifiedRenderer = (() => {
     }
     return "";
   }
-  var own7, characters, key, notAlphanumericRegex;
+  var own8, characters, key, notAlphanumericRegex;
   var init_to_named = __esm({
     "node_modules/stringify-entities/lib/util/to-named.js"() {
       init_character_entities_legacy();
       init_character_entities_html4();
       init_dangerous();
-      own7 = {}.hasOwnProperty;
+      own8 = {}.hasOwnProperty;
       characters = {};
       for (key in characterEntitiesHtml4) {
-        if (own7.call(characterEntitiesHtml4, key)) {
+        if (own8.call(characterEntitiesHtml4, key)) {
           characters[characterEntitiesHtml4[key]] = key;
         }
       }
@@ -23170,7 +23685,7 @@ var UnifiedRenderer = (() => {
   function stringifyEntities(value, options) {
     return core(value, Object.assign({ format: formatSmart }, options));
   }
-  var init_lib31 = __esm({
+  var init_lib33 = __esm({
     "node_modules/stringify-entities/lib/index.js"() {
       init_core();
       init_format_smart();
@@ -23180,12 +23695,12 @@ var UnifiedRenderer = (() => {
   // node_modules/stringify-entities/index.js
   var init_stringify_entities = __esm({
     "node_modules/stringify-entities/index.js"() {
-      init_lib31();
+      init_lib33();
     }
   });
 
   // node_modules/hast-util-to-html/lib/handle/comment.js
-  function comment3(node2, _1, _2, state) {
+  function comment4(node2, _1, _2, state) {
     return state.settings.bogusComments ? "<?" + stringifyEntities(
       node2.value,
       Object.assign({}, state.settings.characterReferences, {
@@ -23212,7 +23727,7 @@ var UnifiedRenderer = (() => {
   });
 
   // node_modules/hast-util-to-html/lib/handle/doctype.js
-  function doctype3(_1, _2, _3, state) {
+  function doctype4(_1, _2, _3, state) {
     return "<!" + (state.settings.upperDoctype ? "DOCTYPE" : "doctype") + (state.settings.tightDoctype ? "" : " ") + "html>";
   }
   var init_doctype2 = __esm({
@@ -23228,7 +23743,7 @@ var UnifiedRenderer = (() => {
     return value.replace(re, "") === "";
   }
   var re;
-  var init_lib32 = __esm({
+  var init_lib34 = __esm({
     "node_modules/hast-util-whitespace/lib/index.js"() {
       re = /[ \t\n\f\r]/g;
     }
@@ -23237,7 +23752,7 @@ var UnifiedRenderer = (() => {
   // node_modules/hast-util-whitespace/index.js
   var init_hast_util_whitespace = __esm({
     "node_modules/hast-util-whitespace/index.js"() {
-      init_lib32();
+      init_lib34();
     }
   });
 
@@ -23271,13 +23786,13 @@ var UnifiedRenderer = (() => {
   function omission(handlers2) {
     return omit;
     function omit(node2, index2, parent) {
-      return own8.call(handlers2, node2.tagName) && handlers2[node2.tagName](node2, index2, parent);
+      return own9.call(handlers2, node2.tagName) && handlers2[node2.tagName](node2, index2, parent);
     }
   }
-  var own8;
+  var own9;
   var init_omission = __esm({
     "node_modules/hast-util-to-html/lib/omission/omission.js"() {
-      own8 = {}.hasOwnProperty;
+      own9 = {}.hasOwnProperty;
     }
   });
 
@@ -23430,7 +23945,7 @@ var UnifiedRenderer = (() => {
   });
 
   // node_modules/hast-util-to-html/lib/handle/element.js
-  function element5(node2, index2, parent, state) {
+  function element6(node2, index2, parent, state) {
     const schema = state.schema;
     const omit = schema.space === "svg" ? false : state.settings.omitOptionalTags;
     let selfClosing = schema.space === "svg" ? state.settings.closeEmptyElements : state.settings.voids.includes(node2.tagName.toLowerCase());
@@ -23462,14 +23977,14 @@ var UnifiedRenderer = (() => {
     }
     return parts.join("");
   }
-  function serializeAttributes(state, properties) {
+  function serializeAttributes(state, properties2) {
     const values = [];
     let index2 = -1;
     let key2;
-    if (properties) {
-      for (key2 in properties) {
-        if (properties[key2] !== null && properties[key2] !== void 0) {
-          const value = serializeAttribute(state, key2, properties[key2]);
+    if (properties2) {
+      for (key2 in properties2) {
+        if (properties2[key2] !== null && properties2[key2] !== void 0) {
+          const value = serializeAttribute(state, key2, properties2[key2]);
           if (value) values.push(value);
         }
       }
@@ -23569,7 +24084,7 @@ var UnifiedRenderer = (() => {
   });
 
   // node_modules/hast-util-to-html/lib/handle/text.js
-  function text8(node2, _, parent, state) {
+  function text9(node2, _, parent, state) {
     return parent && parent.type === "element" && (parent.tagName === "script" || parent.tagName === "style") ? node2.value : stringifyEntities(
       node2.value,
       Object.assign({}, state.settings.characterReferences, {
@@ -23587,7 +24102,7 @@ var UnifiedRenderer = (() => {
 
   // node_modules/hast-util-to-html/lib/handle/raw.js
   function raw2(node2, index2, parent, state) {
-    return state.settings.allowDangerousHtml ? node2.value : text8(node2, index2, parent, state);
+    return state.settings.allowDangerousHtml ? node2.value : text9(node2, index2, parent, state);
   }
   var init_raw = __esm({
     "node_modules/hast-util-to-html/lib/handle/raw.js"() {
@@ -23596,7 +24111,7 @@ var UnifiedRenderer = (() => {
   });
 
   // node_modules/hast-util-to-html/lib/handle/root.js
-  function root5(node2, _1, _2, state) {
+  function root6(node2, _1, _2, state) {
     return state.all(node2);
   }
   var init_root3 = __esm({
@@ -23628,7 +24143,7 @@ var UnifiedRenderer = (() => {
       handle2 = zwitch("type", {
         invalid,
         unknown: unknown2,
-        handlers: { comment: comment3, doctype: doctype3, element: element5, raw: raw2, root: root5, text: text8 }
+        handlers: { comment: comment4, doctype: doctype4, element: element6, raw: raw2, root: root6, text: text9 }
       });
     }
   });
@@ -23678,15 +24193,15 @@ var UnifiedRenderer = (() => {
   }
   function all5(parent) {
     const results = [];
-    const children = parent && parent.children || emptyChildren2;
+    const children2 = parent && parent.children || emptyChildren2;
     let index2 = -1;
-    while (++index2 < children.length) {
-      results[index2] = this.one(children[index2], index2, parent);
+    while (++index2 < children2.length) {
+      results[index2] = this.one(children2[index2], index2, parent);
     }
     return results.join("");
   }
   var emptyOptions5, emptyCharacterReferences, emptyChildren2;
-  var init_lib33 = __esm({
+  var init_lib35 = __esm({
     "node_modules/hast-util-to-html/lib/index.js"() {
       init_html_void_elements();
       init_property_information();
@@ -23700,7 +24215,7 @@ var UnifiedRenderer = (() => {
   // node_modules/hast-util-to-html/index.js
   var init_hast_util_to_html = __esm({
     "node_modules/hast-util-to-html/index.js"() {
-      init_lib33();
+      init_lib35();
     }
   });
 
@@ -23713,7 +24228,7 @@ var UnifiedRenderer = (() => {
       return toHtml(tree, settings);
     }
   }
-  var init_lib34 = __esm({
+  var init_lib36 = __esm({
     "node_modules/rehype-stringify/lib/index.js"() {
       init_hast_util_to_html();
     }
@@ -23726,7 +24241,7 @@ var UnifiedRenderer = (() => {
   });
   var init_rehype_stringify = __esm({
     "node_modules/rehype-stringify/index.js"() {
-      init_lib34();
+      init_lib36();
     }
   });
 
@@ -23738,6 +24253,12 @@ var UnifiedRenderer = (() => {
       var remarkGfm2 = (init_remark_gfm(), __toCommonJS(remark_gfm_exports)).default || (init_remark_gfm(), __toCommonJS(remark_gfm_exports));
       var remarkRehype2 = (init_remark_rehype(), __toCommonJS(remark_rehype_exports)).default || (init_remark_rehype(), __toCommonJS(remark_rehype_exports));
       var rehypeRaw2 = (init_rehype_raw(), __toCommonJS(rehype_raw_exports)).default || (init_rehype_raw(), __toCommonJS(rehype_raw_exports));
+      var rehypeSanitize2 = null;
+      try {
+        rehypeSanitize2 = (init_rehype_sanitize(), __toCommonJS(rehype_sanitize_exports)).default || (init_rehype_sanitize(), __toCommonJS(rehype_sanitize_exports));
+      } catch (_) {
+        rehypeSanitize2 = null;
+      }
       var rehypeStringify2 = (init_rehype_stringify(), __toCommonJS(rehype_stringify_exports)).default || (init_rehype_stringify(), __toCommonJS(rehype_stringify_exports));
       var { visit: visit2 } = (init_unist_util_visit(), __toCommonJS(unist_util_visit_exports));
       function remarkSourceLine() {
@@ -23749,24 +24270,6 @@ var UnifiedRenderer = (() => {
             if (node2.position && node2.position.start) {
               node2.data.hProperties = node2.data.hProperties || {};
               node2.data.hProperties["data-source-line"] = String(node2.position.start.line);
-            }
-          });
-        };
-      }
-      function remarkBreaks() {
-        return (tree) => {
-          visit2(tree, "text", (node, index, parent) => {
-            if (parent && (parent.type === "paragraph" || parent.type === "heading")) {
-              const parts = node.value.split("\n");
-              if (parts.length > 1) {
-                const children = [];
-                for (let i = 0; i < parts.length; i++) {
-                  if (i > 0) children.push({ type: "break" });
-                  if (parts[i] !== "") children.push({ type: "text", value: parts[i] });
-                }
-                parent.children.splice(index, 1, ...children);
-                return index + children.length;
-              }
             }
           });
         };
@@ -24043,18 +24546,31 @@ var UnifiedRenderer = (() => {
             i++;
             continue;
           }
-          if (isTableRow(line) && i + 1 < lines.length && isTableSep(lines[i + 1])) {
-            const prevIdx = prevNonBlankLine(lines, i - 1);
-            if (prevIdx !== -1 && prevIdx === i - 1 && isContainerLine(lines[prevIdx])) {
-              const tableLines = [line, lines[i + 1]];
-              let j = i + 2;
-              while (j < lines.length && isTableRow(lines[j])) {
-                tableLines.push(lines[j]);
-                j++;
+          const sp = stripContainerPrefix(line);
+          if (i + 1 < lines.length) {
+            const spNext = stripContainerPrefix(lines[i + 1]);
+            if (isTableRow(sp.body) && isTableSep(spNext.body)) {
+              const prevIdx = prevNonBlankLine(lines, i - 1);
+              const prevIsContainerAdj = prevIdx !== -1 && prevIdx === i - 1 && isContainerLine(lines[prevIdx]);
+              if (prevIsContainerAdj || sp.prefix.trim() !== "") {
+                const tableLines = [sp.body, spNext.body];
+                let j = i + 2;
+                while (j < lines.length) {
+                  const s2 = stripContainerPrefix(lines[j]);
+                  if (isTableRow(s2.body)) {
+                    tableLines.push(s2.body);
+                    j++;
+                  } else {
+                    break;
+                  }
+                }
+                const tableHtml = gfmTableToHtml(tableLines);
+                const prefix = sp.prefix.trim() !== "" ? sp.prefix : prevIdx !== -1 && lines[prevIdx].trimStart().startsWith(">") ? "> " : "  ";
+                const prefixedHtml = tableHtml.split("\n").map((l) => l === "" ? l : prefix + l).join("\n");
+                result.push(prefixedHtml);
+                i = j;
+                continue;
               }
-              result.push(gfmTableToHtml(tableLines));
-              i = j;
-              continue;
             }
           }
           result.push(line);
@@ -24073,6 +24589,10 @@ var UnifiedRenderer = (() => {
         const t = line.trim();
         return /^\|[-:| ]+\|$/.test(t) && /---/.test(t);
       }
+      function stripContainerPrefix(line) {
+        const m = line.match(/^(\s*(?:>\s*)*)([\s\S]*)$/);
+        return { prefix: m[1], body: m[2] };
+      }
       function prevNonBlankLine(lines, startIdx) {
         for (let i = startIdx; i >= 0; i--) {
           if (lines[i].trim() !== "") return i;
@@ -24084,9 +24604,9 @@ var UnifiedRenderer = (() => {
         const headerLine = allLines[0];
         const sepLine = allLines[1];
         const dataLines = allLines.slice(2).filter((l) => l !== "");
-        const headerCells = headerLine.split("|").filter((c, i2, a) => i2 > 0 && i2 < a.length - 1);
+        const headerCells = headerLine.split("|").filter((c, i, a) => i > 0 && i < a.length - 1);
         const colCount = headerCells.length;
-        const sepCells = sepLine.split("|").filter((c, i2, a) => i2 > 0 && i2 < a.length - 1);
+        const sepCells = sepLine.split("|").filter((c, i, a) => i > 0 && i < a.length - 1);
         const aligns = sepCells.map((cell) => {
           const t = cell.trim();
           if (t.startsWith(":") && t.endsWith(":")) return "center";
@@ -24094,34 +24614,34 @@ var UnifiedRenderer = (() => {
           if (t.startsWith(":")) return "left";
           return null;
         });
-        let html = '<table>\n<thead>\n<tr>\n';
+        let html7 = "<table>\n<thead>\n<tr>\n";
         for (let ci = 0; ci < colCount; ci++) {
           const align = aligns[ci] || null;
-          html += "<th" + (align ? ' style="text-align:' + align + '"' : "") + ">" + renderCellContent(headerCells[ci].trim()) + "</th>\n";
+          html7 += "<th" + (align ? ' style="text-align:' + align + '"' : "") + ">" + renderCellContent(headerCells[ci].trim()) + "</th>\n";
         }
-        html += "</tr>\n</thead>\n";
+        html7 += "</tr>\n</thead>\n";
         if (dataLines.length > 0) {
-          html += "<tbody>\n";
+          html7 += "<tbody>\n";
           for (const row of dataLines) {
-            const cells = row.split("|").filter((c, i2, a) => i2 > 0 && i2 < a.length - 1);
-            html += "<tr>\n";
+            const cells2 = row.split("|").filter((c, i, a) => i > 0 && i < a.length - 1);
+            html7 += "<tr>\n";
             for (let ci = 0; ci < colCount; ci++) {
-              const cell = ci < cells.length ? cells[ci].trim() : "";
-              html += "<td>" + renderCellContent(cell) + "</td>\n";
+              const cell = ci < cells2.length ? cells2[ci].trim() : "";
+              html7 += "<td>" + renderCellContent(cell) + "</td>\n";
             }
-            html += "</tr>\n";
+            html7 += "</tr>\n";
           }
-          html += "</tbody>\n";
+          html7 += "</tbody>\n";
         }
-        html += "</table>";
-        return html;
+        html7 += "</table>";
+        return html7;
       }
-      function renderCellContent(text) {
-        let result = escapeHTML(text);
+      function renderCellContent(text10) {
+        let result = escapeHTML(text10);
         const codeSpans = [];
-        result = result.replace(/`(.+?)`/g, (m, code) => {
+        result = result.replace(/`(.+?)`/g, (m, code4) => {
           const idx = codeSpans.length;
-          codeSpans.push(code);
+          codeSpans.push(code4);
           return "%%CODE" + idx + "%%";
         });
         result = result.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*(.+?)\*/g, "<em>$1</em>").replace(/~~(.+?)~~/g, "<del>$1</del>").replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
@@ -24158,8 +24678,8 @@ var UnifiedRenderer = (() => {
         let result = html7;
         for (let idx = 0; idx < placeholders.length; idx++) {
           const ph = placeholders[idx];
-          const text9 = typeof ph === "string" ? ph : ph.text;
-          const escaped = escapeHTML(text9);
+          const text10 = typeof ph === "string" ? ph : ph.text;
+          const escaped = escapeHTML(text10);
           if (ph.display) {
             const marker = '<div class="math-placeholder" data-math-idx="' + idx + '" data-source-line="' + ph.line + '"></div>';
             const wrapped = '<span class="math-display" data-source-line="' + ph.line + '">' + escaped + "</span>";
@@ -24303,9 +24823,9 @@ var UnifiedRenderer = (() => {
           } else if (skipStack.length === 0 && html7[i] === "=" && html7[i + 1] === "=" && (i === 0 || html7[i - 1] !== "=")) {
             const end = html7.indexOf("==", i + 2);
             if (end !== -1 && html7[end + 2] !== "=") {
-              const text9 = html7.substring(i + 2, end);
-              if (text9.length > 0 && !/[\n\r]/.test(text9)) {
-                result += "<mark>" + text9 + "</mark>";
+              const text10 = html7.substring(i + 2, end);
+              if (text10.length > 0 && !/[\n\r]/.test(text10)) {
+                result += "<mark>" + text10 + "</mark>";
                 i = end + 2;
                 continue;
               }
@@ -24319,118 +24839,23 @@ var UnifiedRenderer = (() => {
         }
         return result;
       }
-      function extractFootnotes(content4) {
-        const lines = content4.split("\n");
-        const cleaned = [];
-        const definitions = [];
-        let inCodeBlock2 = false;
-        let codeFence = "";
-        for (let i2 = 0; i2 < lines.length; i2++) {
-          const line = lines[i2];
-          const trimmed = line.trim();
-          if (trimmed.startsWith("```") || trimmed.startsWith("~~~")) {
-            if (!inCodeBlock2) {
-              inCodeBlock2 = true;
-              codeFence = trimmed.substring(0, 3);
-            } else if (trimmed.startsWith(codeFence)) {
-              inCodeBlock2 = false;
-            }
-            cleaned.push(line);
-            continue;
-          }
-          if (inCodeBlock2) {
-            cleaned.push(line);
-            continue;
-          }
-          const defMatch = line.match(/^\[\^([^\]]+)\]\s*:\s*(.*)/);
-          if (defMatch) {
-            const id = defMatch[1];
-            let defBody = defMatch[2];
-            let j = i2 + 1;
-            while (j < lines.length) {
-              const next = lines[j];
-              if (next === "" || next.startsWith("  ") || next.startsWith("\t")) {
-                if (next === "") {
-                  defBody += "\n";
-                } else {
-                  defBody += "\n" + next.replace(/^\s{2}|\t/, "");
+      function remarkBreaks() {
+        return (tree) => {
+          visit2(tree, "text", (node2, index2, parent) => {
+            if (parent && (parent.type === "paragraph" || parent.type === "heading")) {
+              const parts = node2.value.split("\n");
+              if (parts.length > 1) {
+                const children2 = [];
+                for (let i = 0; i < parts.length; i++) {
+                  if (i > 0) children2.push({ type: "break" });
+                  if (parts[i] !== "") children2.push({ type: "text", value: parts[i] });
                 }
-                j++;
-              } else {
-                break;
+                parent.children.splice(index2, 1, ...children2);
+                return index2 + children2.length;
               }
             }
-            definitions.push({ id, definition: defBody.trim(), line: i2 + 1 });
-            for (let k = i2; k < j; k++) cleaned.push("");
-            i2 = j - 1;
-            continue;
-          }
-          cleaned.push(line);
-        }
-        return { content: cleaned.join("\n"), definitions };
-      }
-      function renderFootnotes(html8, definitions) {
-        if (definitions.length === 0) return html8;
-        const usedIds = new Map();
-        const fnIds = [];
-        for (const def of definitions) {
-          let baseId = def.id.toLowerCase().replace(/[\s"'<>&#]/g, "-").replace(/--+/g, "-").replace(/^-|-$/g, "");
-          if (!baseId) baseId = "fn";
-          const count = usedIds.get(baseId) || 0;
-          const elementId = count === 0 ? baseId : baseId + "-" + count;
-          usedIds.set(baseId, count + 1);
-          fnIds.push({ id: def.id, displayId: def.id, elementId, definition: def.definition });
-        }
-        let result2 = "";
-        let i3 = 0;
-        const skipTags2 = ["code", "pre", "a", "katex"];
-        const skipStack2 = [];
-        while (i3 < html8.length) {
-          if (html8[i3] === "<") {
-            const end = html8.indexOf(">", i3);
-            if (end === -1) { result2 += html8[i3]; i3++; continue; }
-            const inner = html8.substring(i3 + 1, end);
-            const tagName = inner.split(/\s/)[0].toLowerCase();
-            if (tagName.startsWith("/")) {
-              const closing = tagName.substring(1);
-              const idx = skipStack2.lastIndexOf(closing);
-              if (idx !== -1) skipStack2.splice(idx, 1);
-            } else if (skipTags2.includes(tagName)) {
-              skipStack2.push(tagName);
-            }
-            result2 += html8.substring(i3, end + 1);
-            i3 = end + 1;
-          } else if (skipStack2.length === 0) {
-            const refMatch = html8.substring(i3).match(/\[\^([^\]]+)\]/);
-            if (refMatch && refMatch.index === 0) {
-              const refId = refMatch[1];
-              const fn = fnIds.find((f) => f.id === refId);
-              if (fn) {
-                result2 += '<sup class="footnote-ref" id="fnref-' + fn.elementId + '">';
-                result2 += '<a href="#fn-' + fn.elementId + '">[' + fn.displayId + ']</a>';
-                result2 += '</sup>';
-              } else {
-                result2 += '[^' + refId + ']';
-              }
-              i3 += refMatch[0].length;
-            } else {
-              result2 += html8[i3];
-              i3++;
-            }
-          } else {
-            result2 += html8[i3];
-            i3++;
-          }
-        }
-        let section = '\n<hr class="footnotes-sep">\n<section class="footnotes">\n<ol>\n';
-        for (const fn of fnIds) {
-          section += '<li id="fn-' + fn.elementId + '" class="footnote-definition">\n';
-          section += '<p>' + fn.definition;
-          section += ' <a href="#fnref-' + fn.elementId + '" class="footnote-backref" title="返回文中">↩</a>';
-          section += '</p>\n</li>\n';
-        }
-        section += '</ol>\n</section>';
-        return result2 + section;
+          });
+        };
       }
       function remarkSoftBreaks() {
         return (tree) => {
@@ -24459,6 +24884,142 @@ var UnifiedRenderer = (() => {
           walk(tree);
         };
       }
+      function remarkHardBreaksOnly() {
+        return (tree) => {
+          const toBr = () => ({ type: "html", value: "<br>" });
+          const walk = (node2) => {
+            if (!node2.children) return;
+            const out = [];
+            for (const child of node2.children) {
+              if (child.type === "break") {
+                out.push(toBr());
+                continue;
+              }
+              walk(child);
+              out.push(child);
+            }
+            node2.children = out;
+          };
+          walk(tree);
+        };
+      }
+      function extractFootnotes(content3) {
+        const lines = content3.split("\n");
+        const cleaned = [];
+        const definitions = [];
+        let inCodeBlock = false;
+        let codeFence = "";
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          const trimmed = line.trim();
+          if (trimmed.startsWith("```") || trimmed.startsWith("~~~")) {
+            if (!inCodeBlock) {
+              inCodeBlock = true;
+              codeFence = trimmed.substring(0, 3);
+            } else if (trimmed.startsWith(codeFence)) {
+              inCodeBlock = false;
+            }
+            cleaned.push(line);
+            continue;
+          }
+          if (inCodeBlock) {
+            cleaned.push(line);
+            continue;
+          }
+          const defMatch = line.match(/^\[\^([^\]]+)\]\s*:\s*(.*)/);
+          if (defMatch) {
+            const id = defMatch[1];
+            let defBody = defMatch[2];
+            let j = i + 1;
+            while (j < lines.length) {
+              const next2 = lines[j];
+              if (next2 === "" || next2.startsWith("  ") || next2.startsWith("	")) {
+                if (next2 === "") {
+                  defBody += "\n";
+                } else {
+                  defBody += "\n" + next2.replace(/^\s{2}|\t/, "");
+                }
+                j++;
+              } else {
+                break;
+              }
+            }
+            definitions.push({ id, definition: defBody.trim(), line: i + 1 });
+            for (let k = i; k < j; k++) cleaned.push("");
+            i = j - 1;
+            continue;
+          }
+          cleaned.push(line);
+        }
+        return { content: cleaned.join("\n"), definitions };
+      }
+      function renderFootnotes(html7, definitions) {
+        if (definitions.length === 0) return html7;
+        const usedIds = /* @__PURE__ */ new Map();
+        const fnIds = [];
+        for (const def of definitions) {
+          let baseId = def.id.toLowerCase().replace(/[\s"'<>&#]/g, "-").replace(/--+/g, "-").replace(/^-|-$/g, "");
+          if (!baseId) baseId = "fn";
+          const count = usedIds.get(baseId) || 0;
+          const elementId = count === 0 ? baseId : baseId + "-" + count;
+          usedIds.set(baseId, count + 1);
+          fnIds.push({ id: def.id, displayId: def.id, elementId, definition: def.definition });
+        }
+        let result = "";
+        let i = 0;
+        const skipTags = ["code", "pre", "a", "katex"];
+        const skipStack = [];
+        while (i < html7.length) {
+          if (html7[i] === "<") {
+            const end = html7.indexOf(">", i);
+            if (end === -1) {
+              result += html7[i];
+              i++;
+              continue;
+            }
+            const inner = html7.substring(i + 1, end);
+            const tagName = inner.split(/\s/)[0].toLowerCase();
+            if (tagName.startsWith("/")) {
+              const closing2 = tagName.substring(1);
+              const idx = skipStack.lastIndexOf(closing2);
+              if (idx !== -1) skipStack.splice(idx, 1);
+            } else if (skipTags.includes(tagName)) {
+              skipStack.push(tagName);
+            }
+            result += html7.substring(i, end + 1);
+            i = end + 1;
+          } else if (skipStack.length === 0) {
+            const refMatch = html7.substring(i).match(/\[\^([^\]]+)\]/);
+            if (refMatch && refMatch.index === 0) {
+              const refId = refMatch[1];
+              const fn = fnIds.find((f) => f.id === refId);
+              if (fn) {
+                result += '<sup class="footnote-ref" id="fnref-' + fn.elementId + '">';
+                result += '<a href="#fn-' + fn.elementId + '">[' + fn.displayId + "]</a>";
+                result += "</sup>";
+              } else {
+                result += "[^" + refId + "]";
+              }
+              i += refMatch[0].length;
+            } else {
+              result += html7[i];
+              i++;
+            }
+          } else {
+            result += html7[i];
+            i++;
+          }
+        }
+        let section = '\n<hr class="footnotes-sep">\n<section class="footnotes">\n<ol>\n';
+        for (const fn of fnIds) {
+          section += '<li id="fn-' + fn.elementId + '" class="footnote-definition">\n';
+          section += "<p>" + fn.definition;
+          section += ' <a href="#fnref-' + fn.elementId + '" class="footnote-backref" title="\u8FD4\u56DE\u6587\u4E2D">\u21A9</a>';
+          section += "</p>\n</li>\n";
+        }
+        section += "</ol>\n</section>";
+        return result + section;
+      }
       function renderMarkdown(content3, options) {
         const opts = options || {};
         const softBreaks = opts.softBreaks === true;
@@ -24476,11 +25037,27 @@ var UnifiedRenderer = (() => {
         const footnoteDefs = footnoteResult.definitions;
         let html7;
         try {
-          const processor = unified2().use(remarkParse2).use(remarkGfm2, { singleTilde: false }).use(remarkSourceLine).use(remarkBreaks);
+          const processor = unified2().use(remarkParse2).use(remarkGfm2, { singleTilde: false }).use(remarkSourceLine);
           if (softBreaks) {
+            processor.use(remarkBreaks);
             processor.use(remarkSoftBreaks);
+          } else {
+            processor.use(remarkHardBreaksOnly);
           }
-          processor.use(remarkRehype2, { allowDangerousHtml: true }).use(rehypeRaw2).use(rehypeStringify2, { allowDangerousHtml: true });
+          processor.use(remarkRehype2, { allowDangerousHtml: true }).use(rehypeRaw2);
+          if (rehypeSanitize2 && rehypeSanitize2.defaultSchema) {
+            const base = rehypeSanitize2.defaultSchema;
+            const schema = {
+              ...base,
+              attributes: {
+                ...base.attributes,
+                img: [...base.attributes.img || ["src", "alt", "title"], "width", "height", "srcset", "loading"]
+              },
+              allowedSchemes: [...base.allowedSchemes || ["http", "https", "mailto", "tel"], "file"]
+            };
+            processor.use(rehypeSanitize2, schema);
+          }
+          processor.use(rehypeStringify2, { allowDangerousHtml: true });
           html7 = processor.processSync(processed).toString();
         } catch (e) {
           console.error("Unified rendering error:", e);

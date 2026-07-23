@@ -2421,6 +2421,12 @@ class MarkdownEditor {
     this.cm.on('change', () => {
       this.activeTab.content = this.cm.getValue();
       this.updateTabDisplay();
+      // 大文档滑动窗口模式：打字时把窗口焦点同步到光标当前行（0-based），
+      // 否则 updatePreview 仍按旧 _previewFocusLine 渲染切片，导致光标处新输入不显示、且预览跳到旧焦点。
+      // 滚动驱动的虚拟重渲染走各自的焦点计算，这里只在窗口模式下跟随光标。
+      if (this.previewWindow) {
+        this._previewFocusLine = this.cm.getCursor().line;
+      }
       this.debounceUpdatePreview();
     });
 
@@ -2722,6 +2728,9 @@ class MarkdownEditor {
     });
     document.getElementById('btn-new').addEventListener('click', () => {
       document.getElementById('file-menu').classList.add('hidden');
+      this.newFile();
+    });
+    document.getElementById('btn-add-tab').addEventListener('click', () => {
       this.newFile();
     });
     document.getElementById('btn-open').addEventListener('click', () => {
